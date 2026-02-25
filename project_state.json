@@ -1,0 +1,442 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 21,
+  "summary": "Study Sphere Pakistan — a fully responsive, PWA-enabled educational website for Pakistani students (9th–12th class + MDCAT prep). Features include animated splash screen, class/subject/chapter navigation, admin panel at /admin URL protected by password prompt (password: qwet1234, verified against Motoko canister hash, session-based auth via sessionStorage) for uploading/editing/deleting chapters with manual entry forms for quizzes and flashcards, Google Drive notes embed, HTML5 audio player, interactive MCQ quiz, 3D flip flashcards, progress tracking, recently viewed, MDCAT prep section, Terms & Conditions, Support Us page (Easypaisa: 03320335528), dark mode toggle, and PWA/offline support. Chapters and all uploaded material (quiz, flashcards, notes URL, audio URL) are stored permanently in a Motoko backend canister on the Internet Computer for cross-device sync. User-specific data (progress, recently viewed) remains device-local in LocalStorage.",
+  "architectural_notes": [
+    "PWA with service worker for offline support and installability",
+    "Medical/academic theme: blue, white, soft gradients; mobile-first responsive design",
+    "Quiz and flashcard data entered via manual dynamic input fields (not JSON text areas) in the admin panel",
+    "Chapter data (title, class, subject, notes URL, audio URL, quiz, flashcards) stored permanently in a Motoko canister on the Internet Computer — replaces LocalStorage for chapter persistence",
+    "Cross-device sync: all devices fetch chapters from the shared canister in real time; user progress and recently viewed remain device-local in LocalStorage",
+    "Favorites feature removed entirely — no per-user saved favorites",
+    "Admin panel at /admin now requires password entry — password hash stored in Motoko canister, verified server-side; session auth stored in sessionStorage (browser session only)"
+  ],
+  "known_issues": [
+    "Admin password prompt at /admin returns 'Incorrect password' for correct password 'qwet1234' — SHA-256 hash mismatch between frontend and canister stored hash"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-an-animated-splash-screen-that-displays-the-study-sphere-pakistan-logo-centered-on-screen-fades-in-on-load-stays-visible-for-3-seconds-then-fades-out-and-automatically-redirects-to-the-homepage-use-smooth-css-opacity-transitions",
+      "title": "Create an animated splash screen that displays the Study Sphere Pakistan logo centered on screen, fades in on load, stays visible for 3 seconds, then fades out and automatically redirects to the homepage. Use smooth CSS opacity transitions.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-homepage-with-the-study-sphere-pakistan-logo-and-site-name-at-the-top-five-large-rounded-gradient-buttons-9th-class-10th-class-11th-class-12th-class-mdcat-prep-that-link-to-their-respective-pages-a-search-bar-to-search-chapters-and-a-dark-mode-toggle-apply-smooth-hover-animations-slight-lift-shadow-on-buttons-and-smooth-page-transitions",
+      "title": "Build the homepage with the Study Sphere Pakistan logo and site name at the top, five large rounded gradient buttons (9th Class, 10th Class, 11th Class, 12th Class, MDCAT Prep) that link to their respective pages, a search bar to search chapters, and a dark mode toggle. Apply smooth hover animations (slight lift + shadow) on buttons and smooth page transitions.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-individual-class-pages-for-9th-10th-11th-and-12th-class-each-page-displays-four-subject-buttons-english-biology-chemistry-physics-in-a-responsive-grid-layout-with-animated-hover-effects-each-subject-button-navigates-to-its-corresponding-subject-page",
+      "title": "Create individual class pages for 9th, 10th, 11th, and 12th class. Each page displays four subject buttons (English, Biology, Chemistry, Physics) in a responsive grid layout with animated hover effects. Each subject button navigates to its corresponding subject page.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-subject-pages-for-each-class-subject-combination-each-subject-page-shows-a-searchable-chapter-list-an-upload-chapter-button-that-redirects-to-admin-a-recently-viewed-section-and-a-favorite-chapters-section-chapter-list-and-favorites-recently-viewed-data-must-be-loaded-from-localstorage-indexeddb",
+      "title": "Build subject pages for each class-subject combination. Each subject page shows: a searchable chapter list, an 'Upload Chapter' button that redirects to /admin, a 'Recently Viewed' section, and a 'Favorite Chapters' section. Chapter list and favorites/recently-viewed data must be loaded from LocalStorage/IndexedDB.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-individual-chapter-pages-each-chapter-page-displays-four-action-buttons-notes-embeds-the-stored-google-drive-url-in-a-viewer-audio-html5-audio-player-with-the-stored-audio-url-quiz-interactive-mcq-section-and-flashcards-3d-flip-card-section-include-progress-tracking-mark-as-completed-and-an-add-to-favorites-toggle-handle-broken-missing-links-gracefully-with-error-messages",
+      "title": "Create individual chapter pages. Each chapter page displays four action buttons: Notes (embeds the stored Google Drive URL in a viewer), Audio (HTML5 audio player with the stored audio URL), Quiz (interactive MCQ section), and Flashcards (3D flip card section). Include progress tracking (mark as completed), and an add-to-favorites toggle. Handle broken/missing links gracefully with error messages.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-admin-panel-accessible-at-the-admin-route-with-no-login-or-authentication-required-the-panel-allows-any-user-to-create-a-new-chapter-with-fields-for-chapter-title-class-subject-notes-google-drive-url-book-pdf-url-audio-lecture-url-quiz-json-flashcard-json-edit-any-existing-chapter-and-delete-any-chapter-with-a-confirmation-dialog-quiz-and-flashcard-data-must-use-separate-json-text-area-inputs-all-data-must-be-saved-to-localstorage-indexeddb-and-reflected-instantly-without-page-refresh",
+      "title": "Build an admin panel accessible at the /admin route with no login or authentication required. The panel allows any user to: create a new chapter (with fields for Chapter Title, class, subject, Notes Google Drive URL, Book PDF URL, Audio Lecture URL, Quiz JSON, Flashcard JSON), edit any existing chapter, and delete any chapter (with a confirmation dialog). Quiz and Flashcard data must use separate JSON text area inputs. All data must be saved to LocalStorage/IndexedDB and reflected instantly without page refresh.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-define-and-enforce-a-json-schema-for-quiz-and-flashcard-inputs-in-the-admin-panel-quiz-json-should-be-an-array-of-mcq-objects-each-with-a-question-array-of-options-and-correct-answer-index-flashcard-json-should-be-an-array-of-card-objects-each-with-a-front-and-back-string-show-inline-validation-errors-if-the-pasted-json-does-not-match-the-expected-schema",
+      "title": "Define and enforce a JSON schema for Quiz and Flashcard inputs in the admin panel. Quiz JSON should be an array of MCQ objects (each with a question, array of options, and correct answer index). Flashcard JSON should be an array of card objects (each with a front and back string). Show inline validation errors if the pasted JSON does not match the expected schema.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-mdcat-prep-page-with-the-following-sections-past-papers-pdf-upload-link-admin-can-add-edit-delete-practice-tests-pdf-upload-link-admin-can-add-edit-delete-logical-reasoning-english-biology-chemistry-and-physics-the-subject-sections-logical-reasoning-english-biology-chemistry-physics-follow-the-same-structure-as-class-subject-pages-chapter-list-with-search-recently-viewed-and-favorites",
+      "title": "Build the MDCAT Prep page with the following sections: Past Papers (PDF upload/link, admin can add/edit/delete), Practice Tests (PDF upload/link, admin can add/edit/delete), Logical Reasoning, English, Biology, Chemistry, and Physics. The subject sections (Logical Reasoning, English, Biology, Chemistry, Physics) follow the same structure as class subject pages — chapter list with search, recently viewed, and favorites.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-terms-conditions-page-with-formatted-legal-style-content-stating-the-website-is-for-educational-purposes-only-it-is-not-affiliated-with-any-board-content-may-change-users-are-responsible-for-external-links-and-no-copyright-is-claimed-on-uploaded-materials",
+      "title": "Create a Terms & Conditions page with formatted legal-style content stating: the website is for educational purposes only, it is not affiliated with any board, content may change, users are responsible for external links, and no copyright is claimed on uploaded materials.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-support-us-page-with-the-title-support-study-sphere-pakistan-explanatory-text-about-supporting-the-project-via-easypaisa-the-easypaisa-number-03320335528-displayed-prominently-a-copy-to-clipboard-button-for-the-number-and-a-small-thank-you-animation-after-copying-layout-should-be-clean-and-centered",
+      "title": "Create a Support Us page with the title 'Support Study Sphere Pakistan ❤️', explanatory text about supporting the project via Easypaisa, the Easypaisa number 03320335528 displayed prominently, a copy-to-clipboard button for the number, and a small thank-you animation after copying. Layout should be clean and centered.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-pwa-support-add-a-web-app-manifest-name-study-sphere-pakistan-short-name-studysphere-theme-color-aligned-with-the-site-palette-register-a-service-worker-that-caches-the-app-shell-and-static-assets-for-offline-use-and-ensure-the-app-is-installable-on-mobile-and-desktop-browsers",
+      "title": "Implement PWA support: add a web app manifest (name: Study Sphere Pakistan, short_name: StudySphere, theme color aligned with the site palette), register a service worker that caches the app shell and static assets for offline use, and ensure the app is installable on mobile and desktop browsers.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-clean-modern-academic-visual-theme-consistently-across-the-entire-app-use-a-blue-and-white-color-palette-with-soft-gradients-rounded-buttons-with-soft-shadows-smooth-hover-transition-animations-professional-typography-and-a-responsive-mobile-first-layout-include-a-persistent-dark-mode-that-is-toggled-from-the-homepage-and-stored-in-localstorage",
+      "title": "Apply a clean, modern academic visual theme consistently across the entire app. Use a blue and white color palette with soft gradients, rounded buttons with soft shadows, smooth hover/transition animations, professional typography, and a responsive mobile-first layout. Include a persistent dark mode that is toggled from the homepage and stored in LocalStorage.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-save-chapter-button-in-the-admin-panel-admin-so-it-is-always-clickable-and-triggers-the-save-action-the-button-must-not-be-disabled-or-inert-regardless-of-which-fields-are-filled-in",
+      "title": "Fix the Save Chapter button in the admin panel (`/admin`) so it is always clickable and triggers the save action. The button must not be disabled or inert regardless of which fields are filled in.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-all-chapter-fields-except-chapter-title-fully-optional-in-the-admin-panel-s-chapter-creation-and-edit-form-a-chapter-with-only-a-title-entered-must-pass-validation-and-be-saved-to-localstorage-successfully",
+      "title": "Make all chapter fields except 'Chapter Title' fully optional in the admin panel's chapter creation and edit form. A chapter with only a title entered must pass validation and be saved to LocalStorage successfully.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-inline-edit-and-delete-buttons-directly-next-to-each-chapter-title-in-all-chapter-list-views-subject-pages-mdcat-subject-pages-and-the-admin-panel-chapter-list-the-edit-button-opens-the-chapter-edit-form-pre-populated-with-that-chapter-s-data-the-delete-button-shows-a-confirmation-dialog-before-permanently-removing-the-chapter-from-localstorage",
+      "title": "Display inline Edit and Delete buttons directly next to each chapter title in all chapter list views (subject pages, MDCAT subject pages, and the admin panel chapter list). The Edit button opens the chapter edit form pre-populated with that chapter's data. The Delete button shows a confirmation dialog before permanently removing the chapter from LocalStorage.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-save-chapter-button-in-the-admin-panel-s-chapterform-so-it-remains-fully-clickable-and-functional-when-quiz-json-or-flashcard-json-fields-contain-content-the-button-must-not-be-disabled-inert-or-blocked-by-json-validation-state-valid-json-in-either-field-must-allow-the-save-to-proceed-normally-inline-validation-errors-should-display-as-warnings-beside-the-fields-without-preventing-the-save-action",
+      "title": "Fix the Save Chapter button in the admin panel's ChapterForm so it remains fully clickable and functional when Quiz JSON or Flashcard JSON fields contain content. The button must not be disabled, inert, or blocked by JSON validation state. Valid JSON in either field must allow the save to proceed normally; inline validation errors should display as warnings beside the fields without preventing the save action.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-quiz-json-text-area-in-the-admin-panel-s-chapterform-with-a-dynamic-manual-entry-ui-the-quiz-section-must-allow-the-admin-to-add-multiple-questions-one-by-one-each-with-a-question-text-field-a-dynamic-list-of-option-fields-minimum-2-with-an-add-option-button-and-a-correct-answer-selector-radio-or-dropdown-that-picks-which-option-is-correct-include-an-add-question-button-to-append-a-new-blank-question-block-and-a-remove-button-per-question-remove-all-json-text-areas-json-parsing-and-json-validation-logic-for-quizzes-from-chapterform-entirely",
+      "title": "Replace the Quiz JSON text area in the admin panel's ChapterForm with a dynamic manual entry UI. The quiz section must allow the admin to add multiple questions one by one, each with: a question text field, a dynamic list of option fields (minimum 2, with an 'Add Option' button), and a 'Correct Answer' selector (radio or dropdown) that picks which option is correct. Include an 'Add Question' button to append a new blank question block and a remove button per question. Remove all JSON text areas, JSON parsing, and JSON validation logic for quizzes from ChapterForm entirely.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-flashcard-json-text-area-in-the-admin-panel-s-chapterform-with-a-dynamic-manual-entry-ui-the-flashcard-section-must-allow-the-admin-to-add-multiple-flashcards-one-by-one-each-with-a-front-text-field-and-a-back-text-field-include-an-add-flashcard-button-to-append-a-new-blank-card-and-a-remove-button-per-card-remove-all-json-text-areas-json-parsing-and-json-validation-logic-for-flashcards-from-chapterform-entirely",
+      "title": "Replace the Flashcard JSON text area in the admin panel's ChapterForm with a dynamic manual entry UI. The flashcard section must allow the admin to add multiple flashcards one by one, each with a 'Front' text field and a 'Back' text field. Include an 'Add Flashcard' button to append a new blank card and a remove button per card. Remove all JSON text areas, JSON parsing, and JSON validation logic for flashcards from ChapterForm entirely.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-save-chapter-button-in-chapterform-is-always-enabled-and-functional-after-replacing-the-quiz-and-flashcard-fields-with-manual-entry-forms-when-the-admin-clicks-save-the-chapter-must-be-serialized-converting-the-manual-quiz-and-flashcard-entries-into-the-existing-quizquestion-and-flashcarditem-typescript-types-and-saved-to-localstorage-via-storageservice-the-chapter-must-appear-immediately-in-chapter-lists-without-a-page-refresh-the-save-button-must-only-be-disabled-when-the-chapter-title-field-is-empty",
+      "title": "Ensure the Save Chapter button in ChapterForm is always enabled and functional after replacing the quiz and flashcard fields with manual entry forms. When the admin clicks Save, the chapter must be serialized — converting the manual quiz and flashcard entries into the existing QuizQuestion[] and FlashcardItem[] TypeScript types — and saved to LocalStorage via storageService. The chapter must appear immediately in chapter lists without a page refresh. The Save button must only be disabled when the Chapter Title field is empty.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-jsonvalidation-ts-utility-file-or-at-minimum-remove-all-imports-and-usages-of-validatequizjson-and-validateflashcardjson-throughout-chapterform-and-any-other-components-since-json-input-for-quiz-and-flashcard-data-is-no-longer-used-in-the-admin-panel",
+      "title": "Remove the jsonValidation.ts utility file (or at minimum remove all imports and usages of validateQuizJSON and validateFlashcardJSON throughout ChapterForm and any other components) since JSON input for quiz and flashcard data is no longer used in the admin panel.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-flashcard-card-faces-in-flashcardsection-tsx-so-the-front-text-and-back-text-are-always-clearly-visible-against-their-respective-card-backgrounds-the-front-face-and-back-face-must-use-contrasting-text-colors-e-g-dark-text-on-light-background-in-light-mode-light-text-on-dark-background-in-dark-mode-remove-any-styling-that-causes-text-color-to-match-the-card-background-color",
+      "title": "Fix flashcard card faces in FlashcardSection.tsx so the front text and back text are always clearly visible against their respective card backgrounds. The front face and back face must use contrasting text colors (e.g., dark text on light background in light mode, light text on dark background in dark mode). Remove any styling that causes text color to match the card background color.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-dark-mode-implementation-so-it-applies-correctly-and-consistently-across-all-components-and-pages-in-the-app-including-but-not-limited-to-header-footer-layout-homepage-classpage-subjectpage-mdcatpage-mdcatsubjectpage-chapterpage-notes-audio-quiz-flashcards-tabs-adminpage-chapterform-splashscreen-supportpage-and-termspage-the-darkmodecontext-must-toggle-the-dark-class-on-the-document-root-element-all-components-must-use-tailwind-dark-variant-classes-to-respond-to-the-dark-class-on-the-root-the-dark-mode-preference-must-persist-in-localstorage-and-be-restored-on-page-load",
+      "title": "Fix the dark mode implementation so it applies correctly and consistently across all components and pages in the app, including but not limited to: Header, Footer, Layout, HomePage, ClassPage, SubjectPage, MDCATPage, MDCATSubjectPage, ChapterPage (notes, audio, quiz, flashcards tabs), AdminPage, ChapterForm, SplashScreen, SupportPage, and TermsPage. The DarkModeContext must toggle the 'dark' class on the document root element. All components must use Tailwind dark: variant classes to respond to the dark class on the root. The dark mode preference must persist in LocalStorage and be restored on page load.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-restore-the-9th-class-and-10th-class-navigation-buttons-on-the-homepage-so-that-all-five-class-buttons-9th-class-10th-class-11th-class-12th-class-mdcat-prep-are-always-visible-and-functional-investigate-and-fix-any-conditional-rendering-css-hiding-or-data-driven-filtering-that-causes-the-9th-and-10th-class-buttons-to-not-render",
+      "title": "Restore the 9th Class and 10th Class navigation buttons on the HomePage so that all five class buttons (9th Class, 10th Class, 11th Class, 12th Class, MDCAT Prep) are always visible and functional. Investigate and fix any conditional rendering, CSS hiding, or data-driven filtering that causes the 9th and 10th class buttons to not render.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-audioplayer-component-to-accept-and-play-any-type-of-url-without-restricting-or-rejecting-specific-url-formats-remove-any-url-validation-or-filtering-logic-that-blocks-non-standard-urls-e-g-google-drive-links-cloud-storage-links-or-other-indirect-audio-urls-the-html5-audio-element-should-receive-the-url-as-is-and-attempt-playback-displaying-an-appropriate-error-message-only-if-the-browser-itself-cannot-load-the-resource",
+      "title": "Update the AudioPlayer component to accept and play any type of URL without restricting or rejecting specific URL formats. Remove any URL validation or filtering logic that blocks non-standard URLs (e.g., Google Drive links, cloud storage links, or other indirect audio URLs). The HTML5 audio element should receive the URL as-is and attempt playback, displaying an appropriate error message only if the browser itself cannot load the resource.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-subjectpage-mdcatsubjectpage-mdcatpage-chapterpage-and-adminpage-to-fetch-chapters-and-pdf-entries-from-the-motoko-backend-canister-via-backendservice-instead-of-storageservice-localstorage-use-react-query-usequery-for-data-fetching-with-appropriate-cache-keys-per-class-subject-on-add-edit-or-delete-call-the-corresponding-canister-mutation-and-invalidate-the-relevant-react-query-cache-so-lists-refresh-without-a-full-page-reload",
+      "title": "Update SubjectPage, MDCATSubjectPage, MDCATPage, ChapterPage, and AdminPage to fetch chapters and PDF entries from the Motoko backend canister via backendService instead of storageService LocalStorage. Use React Query (useQuery) for data fetching with appropriate cache keys per class/subject. On add, edit, or delete, call the corresponding canister mutation and invalidate the relevant React Query cache so lists refresh without a full page reload.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-chapterform-in-the-admin-panel-to-call-backendservice-createchapter-or-backendservice-updatechapter-instead-of-storageservice-after-a-successful-save-the-parent-page-must-invalidate-its-react-query-cache-and-re-fetch-the-chapter-list-so-the-new-edited-chapter-appears-immediately",
+      "title": "Update ChapterForm in the admin panel to call backendService.createChapter or backendService.updateChapter instead of storageService. After a successful save, the parent page must invalidate its React Query cache and re-fetch the chapter list so the new/edited chapter appears immediately.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-favorites-feature-entirely-from-the-frontend-remove-favorites-state-ui-sections-and-any-favorites-related-functions-from-subjectpage-mdcatsubjectpage-chapterpage-and-storageservice-the-add-to-favorites-toggle-on-chapterpage-and-the-favorite-chapters-section-on-subject-pages-must-be-removed",
+      "title": "Remove the favorites feature entirely from the frontend. Remove favorites state, UI sections, and any favorites-related functions from SubjectPage, MDCATSubjectPage, ChapterPage, and storageService. The 'Add to Favorites' toggle on ChapterPage and the 'Favorite Chapters' section on subject pages must be removed.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-keep-user-specific-data-recently-viewed-chapters-mark-as-completed-progress-device-local-in-localstorage-via-storageservice-these-must-not-be-synced-to-the-canister-the-recently-viewed-section-on-subject-pages-and-the-mark-as-completed-toggle-on-chapter-pages-must-continue-to-work-using-localstorage-only",
+      "title": "Keep user-specific data (recently viewed chapters, mark-as-completed progress) device-local in LocalStorage via storageService. These must NOT be synced to the canister. The Recently Viewed section on subject pages and the Mark as Completed toggle on chapter pages must continue to work using LocalStorage only.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-storageservice-ts-to-remove-all-chapter-crud-functions-savechapter-getchapters-getchapterbyid-deletechapter-and-all-pdf-entry-crud-functions-retaining-only-localstorage-utilities-for-recently-viewed-completed-status-and-dark-mode-preference-this-ensures-no-stale-localstorage-chapter-reads-happen-anywhere",
+      "title": "Update storageService.ts to remove all chapter CRUD functions (saveChapter, getChapters, getChapterById, deleteChapter) and all PDF entry CRUD functions, retaining only LocalStorage utilities for: recently viewed, completed status, and dark mode preference. This ensures no stale LocalStorage chapter reads happen anywhere.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-the-admin-panel-at-admin-must-remain-fully-open-access-with-no-login-or-authentication-required-the-interface-must-remain-visually-unchanged-the-only-change-is-that-chapter-and-pdf-entry-saves-updates-deletes-now-persist-to-the-canister-backend-instead-of-localstorage",
+      "title": "The admin panel at /admin must remain fully open-access with no login or authentication required. The interface must remain visually unchanged. The only change is that chapter and PDF entry saves/updates/deletes now persist to the canister backend instead of LocalStorage.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-frontend-adminauthguard-component-that-wraps-the-adminpage-when-a-user-navigates-to-admin-check-sessionstorage-for-an-adminauthenticated-flag-if-the-flag-is-absent-or-falsy-render-a-centered-password-prompt-screen-instead-of-the-admin-panel-the-prompt-must-include-a-password-input-field-a-login-button-and-an-error-message-area-on-submission-sha-256-hash-the-entered-password-in-the-frontend-and-call-the-backend-verifyadminpassword-canister-function-via-the-actor-if-the-canister-returns-true-set-sessionstorage-setitem-adminauthenticated-true-and-render-the-full-admin-panel-if-it-returns-false-display-an-inline-error-message-incorrect-password-please-try-again-the-sessionstorage-flag-must-be-cleared-automatically-when-the-browser-tab-or-session-closes-sessionstorage-behavior-by-default-the-admin-panel-itself-must-remain-visually-unchanged-after-authentication",
+      "title": "Create a frontend `AdminAuthGuard` component that wraps the `AdminPage`. When a user navigates to `/admin`, check `sessionStorage` for an `adminAuthenticated` flag. If the flag is absent or falsy, render a centered password prompt screen instead of the admin panel. The prompt must include a password input field, a 'Login' button, and an error message area. On submission, SHA-256 hash the entered password in the frontend and call the backend `verifyAdminPassword` canister function via the actor. If the canister returns `true`, set `sessionStorage.setItem('adminAuthenticated', 'true')` and render the full admin panel. If it returns `false`, display an inline error message 'Incorrect password. Please try again.' The `sessionStorage` flag must be cleared automatically when the browser tab or session closes (sessionStorage behavior by default). The admin panel itself must remain visually unchanged after authentication.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-sha-256-hash-mismatch-between-the-frontend-adminauthguard-and-the-motoko-backend-canister-so-that-entering-the-password-qwet1234-at-the-admin-password-prompt-correctly-verifies-and-grants-access-audit-both-the-frontend-hashpassword-ts-utility-which-hashes-the-entered-password-via-web-crypto-api-and-the-hardcoded-sha-256-hash-stored-as-a-stable-variable-in-backend-main-mo-verifyadminpassword-ensure-the-hex-string-produced-by-hashpassword-ts-for-qwet1234-exactly-matches-the-stored-hash-in-the-canister-the-correct-sha-256-hex-digest-of-qwet1234-is-b0b4b7f1e2c7c3e3e6e8e2e1e0e7e4e3e5e6e3e2e1e0b0b4b7f1e2c7c3e3e6e-recompute-and-use-the-actual-correct-sha-256-of-qwet1234-which-is-6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e-in-both-the-canister-stable-variable-and-confirm-the-frontend-hashing-logic-produces-the-same-output-update-backend-main-mo-to-store-the-correct-sha-256-hex-hash-of-qwet1234-and-ensure-hashpassword-ts-produces-an-identical-lowercase-hex-string-using-subtlecrypto-sha-256",
+      "title": "Fix the SHA-256 hash mismatch between the frontend AdminAuthGuard and the Motoko backend canister so that entering the password 'qwet1234' at the /admin password prompt correctly verifies and grants access. Audit both the frontend hashPassword.ts utility (which hashes the entered password via Web Crypto API) and the hardcoded SHA-256 hash stored as a stable variable in backend/main.mo verifyAdminPassword. Ensure the hex string produced by hashPassword.ts for 'qwet1234' exactly matches the stored hash in the canister. The correct SHA-256 hex digest of 'qwet1234' is 'b0b4b7f1e2c7c3e3e6e8e2e1e0e7e4e3e5e6e3e2e1e0b0b4b7f1e2c7c3e3e6e' — recompute and use the actual correct SHA-256 of 'qwet1234' (which is '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') in both the canister stable variable and confirm the frontend hashing logic produces the same output. Update backend/main.mo to store the correct SHA-256 hex hash of 'qwet1234', and ensure hashPassword.ts produces an identical lowercase hex string using SubtleCrypto SHA-256.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-utils-hashpassword-ts-so-that-it-hashes-the-input-password-string-using-subtlecrypto-sha-256-web-crypto-api-encodes-the-string-as-utf-8-bytes-via-textencoder-digests-it-and-converts-the-resulting-arraybuffer-to-a-lowercase-hex-string-with-no-spaces-dashes-or-prefixes-the-function-must-not-trim-normalize-or-transform-the-password-string-before-encoding-verify-that-calling-this-function-with-the-string-qwet1234-produces-the-hex-output-6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+      "title": "Rewrite `frontend/src/utils/hashPassword.ts` so that it hashes the input password string using SubtleCrypto SHA-256 (Web Crypto API), encodes the string as UTF-8 bytes via `TextEncoder`, digests it, and converts the resulting ArrayBuffer to a lowercase hex string with no spaces, dashes, or prefixes. The function must not trim, normalize, or transform the password string before encoding. Verify that calling this function with the string `qwet1234` produces the hex output `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e`.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-audit-frontend-src-components-adminauthguard-tsx-to-confirm-it-calls-hashpassword-enteredpassword-before-passing-the-result-to-the-canister-s-verifyadminpassword-function-and-that-no-additional-transformation-trim-tolowercase-etc-is-applied-to-the-password-between-user-input-and-the-hashing-call-if-any-such-transformation-exists-remove-it-so-the-raw-entered-string-is-passed-directly-to-hashpassword",
+      "title": "Audit `frontend/src/components/AdminAuthGuard.tsx` to confirm it calls `hashPassword(enteredPassword)` before passing the result to the canister's `verifyAdminPassword` function, and that no additional transformation (trim, toLowerCase, etc.) is applied to the password between user input and the hashing call. If any such transformation exists, remove it so the raw entered string is passed directly to `hashPassword`.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Animated splash screen with 3s fade and auto-redirect to homepage",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Homepage with 5 class buttons (9th–12th + MDCAT), search bar, dark mode toggle, smooth animations",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Class pages (9th–12th) with subject buttons (English, Biology, Chemistry, Physics)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Subject pages with chapter list, upload button, search, recently viewed, and favorites sections",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Chapter page with Google Drive notes embed, HTML5 audio player, interactive MCQ quiz with scoring, and 3D flip flashcards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Admin panel at /admin URL — open access (no login), upload/edit/delete chapters with separate JSON inputs for quizzes and flashcards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "MDCAT Prep page with Past Papers, Practice Tests, Logical Reasoning, and subject sections",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Progress tracking, mark as completed, favorites, recently viewed stored in LocalStorage/IndexedDB",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Terms & Conditions page and Support Us page with Easypaisa number (03320335528) and copy-to-clipboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "PWA support — installable, offline-ready, service worker, LocalStorage/IndexedDB for all data persistence",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Fix Save Chapter button (unclickable/disabled) in admin panel, make all fields except title optional, and add inline Edit/Delete buttons next to chapter titles in chapter lists",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Replace Quiz and Flashcard JSON text area inputs in admin panel with manual entry forms — dynamic fields to add quiz questions (with options and correct answer) and flashcards (front/back) one by one; ensure Save button works and chapter is saved to LocalStorage",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Fix flashcard front/back text invisible (same color as card background) — ensure proper contrast; fix dark mode not applying correctly across all components",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Fix 9th & 10th Class buttons not showing on homepage; update audio player to accept any type of URL",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Migrate chapter storage from LocalStorage to a Motoko backend canister on Internet Computer for permanent, cross-device sync. Admin panel stays open-access at /admin (no login). Fresh start (no LocalStorage migration). Favorites feature removed entirely. User progress and recently viewed remain device-local in LocalStorage.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Implement a Motoko backend canister actor in backend/main.mo that stores all chapter data permanently on the Internet Computer. The actor must expose the following stable-storage functions: addChapter(chapter: ChapterInput) -> async Nat (returns new ID), updateChapter(id: Nat, chapter: ChapterInput) -> async Bool, deleteChapter(id: Nat) -> async Bool, getChapter(id: Nat) -> async ?Chapter, getAllChapters() -> async [Chapter]. Each Chapter record must include: id (Nat), title (Text), classNumber (Text), subject (Text), notesUrl (Text), audiUrl (Text), quizQuestions (Text — JSON-serialized array), flashcards (Text — JSON-serialized array), createdAt (Int). Use stable var storage so data survives canister upgrades.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Also include MDCAT PDF entry storage in the Motoko backend. Add addPdfEntry(entry: PdfEntryInput) -> async Nat, updatePdfEntry(id: Nat, entry: PdfEntryInput) -> async Bool, deletePdfEntry(id: Nat) -> async Bool, getAllPdfEntries() -> async [PdfEntry]. Each PdfEntry record must include: id (Nat), title (Text), type (Text — 'past_paper' or 'practice_test'), url (Text).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Create a frontend service file (e.g., frontend/src/utils/backendService.ts) that wraps all calls to the Motoko canister actor using the generated declarations. This service must replace all LocalStorage-based chapter and PDF entry read/write calls throughout the app. It must expose async functions: getChapters(), getChapterById(id), createChapter(data), updateChapter(id, data), deleteChapter(id), getPdfEntries(), createPdfEntry(data), updatePdfEntry(id, data), deletePdfEntry(id). All functions must use the useActor hook pattern already present in the project.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Add password protection to /admin panel — password prompt screen on entry, password 'qwet1234' verified against hash stored in Motoko canister (never exposed in frontend), session-based auth via sessionStorage (cleared on tab/browser close), panel unchanged after login",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Add a `verifyAdminPassword(passwordHash: Text) -> async Bool` function to the Motoko backend actor in `backend/main.mo`. Store the SHA-256 hash of the password `qwet1234` as a stable variable. The function must accept a hash string from the frontend and return `true` only if it matches the stored hash. The raw password must never be stored or returned by any canister function.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Update `backend/main.mo` to store the correct SHA-256 hex hash of the password `qwet1234` in the stable variable used by `verifyAdminPassword`. The stored hash must be exactly `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` (64 lowercase hex characters). The `verifyAdminPassword(passwordHash: Text) -> async Bool` function must perform a strict equality comparison between the incoming `passwordHash` argument and this stored value, returning `true` only on an exact match.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Update `backend/migration.mo` to set the `adminPasswordHash` stable variable to the correct value `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` so that the migration overwrites any previously stored incorrect hash on canister upgrade.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Study Sphere Pakistan",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

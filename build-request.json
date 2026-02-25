@@ -1,0 +1,94 @@
+{
+  "kind": "build_request",
+  "title": "Fix admin password verification — SHA-256 hash mismatch between frontend and canister",
+  "projectName": "Study Sphere Pakistan",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-37",
+      "text": "Rewrite `frontend/src/utils/hashPassword.ts` so that it hashes the input password string using SubtleCrypto SHA-256 (Web Crypto API), encodes the string as UTF-8 bytes via `TextEncoder`, digests it, and converts the resulting ArrayBuffer to a lowercase hex string with no spaces, dashes, or prefixes. The function must not trim, normalize, or transform the password string before encoding. Verify that calling this function with the string `qwet1234` produces the hex output `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e`.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "rewrite hashPassword.ts to produce a clean, verified lowercase hex SHA-256 digest using the Web Crypto API"
+        ]
+      },
+      "acceptanceCriteria": [
+        "hashPassword('qwet1234') resolves to exactly '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e' (lowercase, no extra characters)",
+        "The function uses TextEncoder to encode the raw password string before passing it to SubtleCrypto digest",
+        "The ArrayBuffer result is converted to hex by reading each byte as a 2-digit lowercase hex value",
+        "No trimming, case-folding, or other password transformation is applied before hashing"
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Update `backend/main.mo` to store the correct SHA-256 hex hash of the password `qwet1234` in the stable variable used by `verifyAdminPassword`. The stored hash must be exactly `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` (64 lowercase hex characters). The `verifyAdminPassword(passwordHash: Text) -> async Bool` function must perform a strict equality comparison between the incoming `passwordHash` argument and this stored value, returning `true` only on an exact match.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "update backend/main.mo to store the exact correct SHA-256 hash of 'qwet1234' (which is 6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The stable variable for the admin password hash is set to '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e'",
+        "verifyAdminPassword('6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e') returns true",
+        "verifyAdminPassword with any other string returns false",
+        "The raw password 'qwet1234' is never stored or returned by any canister function"
+      ]
+    },
+    {
+      "id": "REQ-39",
+      "text": "Update `backend/migration.mo` to set the `adminPasswordHash` stable variable to the correct value `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` so that the migration overwrites any previously stored incorrect hash on canister upgrade.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ]
+      },
+      "acceptanceCriteria": [
+        "migration.mo sets adminPasswordHash to '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e'",
+        "After a canister upgrade, verifyAdminPassword correctly accepts the hash of 'qwet1234'"
+      ]
+    },
+    {
+      "id": "REQ-40",
+      "text": "Audit `frontend/src/components/AdminAuthGuard.tsx` to confirm it calls `hashPassword(enteredPassword)` before passing the result to the canister's `verifyAdminPassword` function, and that no additional transformation (trim, toLowerCase, etc.) is applied to the password between user input and the hashing call. If any such transformation exists, remove it so the raw entered string is passed directly to `hashPassword`.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "No not working saying wrong password now set and try to find issue and solve it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AdminAuthGuard passes the password value directly to hashPassword without trimming or casing",
+        "The hex string returned by hashPassword is passed as-is to verifyAdminPassword on the canister",
+        "Entering 'qwet1234' in the password prompt and clicking Login grants access (sessionStorage adminAuthenticated = 'true') and renders the admin panel",
+        "Entering any other password shows 'Incorrect password. Please try again.' inline error"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change any other admin panel UI or behavior — only the hash value and hashing utility",
+    "Do not store or expose the raw password 'qwet1234' anywhere in frontend or backend code",
+    "The stored hash in backend/main.mo must be exactly '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e'"
+  ],
+  "nonGoals": [
+    "Changing the admin password from 'qwet1234' to anything else",
+    "Adding Internet Identity or any other authentication mechanism",
+    "Modifying any other backend functions or data models",
+    "Changing the admin panel UI after successful authentication"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

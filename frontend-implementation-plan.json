@@ -1,0 +1,41 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix admin password verification — SHA-256 hash mismatch between frontend and canister",
+  "requirements": [
+    {
+      "id": "REQ-37",
+      "summary": "Rewrite hashPassword utility to produce correct SHA-256 hex digest using Web Crypto API without any string transformations",
+      "acceptanceCriteria": [
+        "hashPassword('qwet1234') resolves to exactly '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e' (lowercase, no extra characters)",
+        "The function uses TextEncoder to encode the raw password string before passing it to SubtleCrypto digest",
+        "The ArrayBuffer result is converted to hex by reading each byte as a 2-digit lowercase hex value",
+        "No trimming, case-folding, or other password transformation is applied before hashing"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/hashPassword.ts",
+          "operation": "modify",
+          "description": "Rewrite the hashPassword function to accept a raw password string, encode it to UTF-8 bytes using TextEncoder without any trimming or transformation, hash it with SubtleCrypto SHA-256, and convert the resulting ArrayBuffer to a lowercase hex string by mapping each byte to a zero-padded 2-character hex value. Verify the implementation produces '6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e' for input 'qwet1234'."
+        }
+      ]
+    },
+    {
+      "id": "REQ-40",
+      "summary": "Audit and fix AdminAuthGuard to pass the raw entered password directly to hashPassword without any transformation",
+      "acceptanceCriteria": [
+        "AdminAuthGuard passes the password value directly to hashPassword without trimming or casing",
+        "The hex string returned by hashPassword is passed as-is to verifyAdminPassword on the canister",
+        "Entering 'qwet1234' in the password prompt and clicking Login grants access (sessionStorage adminAuthenticated = 'true') and renders the admin panel",
+        "Entering any other password shows 'Incorrect password. Please try again.' inline error"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AdminAuthGuard.tsx",
+          "operation": "modify",
+          "description": "Review the password handling flow in AdminAuthGuard. Remove any trim(), toLowerCase(), or other string transformations applied to the password between user input and the hashPassword call. Ensure the raw entered string is passed directly to hashPassword, and the resulting hex string is passed as-is to the canister's verifyAdminPassword method. Verify that entering 'qwet1234' successfully authenticates and sets sessionStorage adminAuthenticated to 'true', while any other password shows the inline error message."
+        }
+      ]
+    }
+  ]
+}
