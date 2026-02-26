@@ -48,5 +48,4 @@ export interface backendInterface {
     getChapter(id: bigint): Promise<Chapter | null>;
     updateChapter(id: bigint, input: ChapterInput): Promise<boolean>;
     updatePdfEntry(id: bigint, input: PdfEntryInput): Promise<boolean>;
-    verifyAdminPassword(passwordHash: string): Promise<boolean>;
 }

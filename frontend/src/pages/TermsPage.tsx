@@ -25,11 +25,6 @@ export default function TermsPage() {
       content:
         'StudyHub may contain links to external resources such as Google Drive documents and other third-party content. We are not responsible for the availability, accuracy, or content of these external resources.',
     },
-    {
-      title: 'Copyright',
-      content:
-        'All original content created by StudyHub is protected by copyright. Users may use the content for personal educational purposes only. Redistribution, commercial use, or reproduction without permission is prohibited.',
-    },
   ];
 
   return (
@@ -74,6 +69,26 @@ export default function TermsPage() {
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{section.content}</p>
             </div>
           ))}
+
+          {/* Last condition with hidden "Sia" admin entry */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h2 className="font-heading font-semibold text-lg text-gray-900 dark:text-white mb-3">
+              5. Copyright
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              All original content created by StudyHub is protected by copyright. Users may use the
+              content for personal educational purposes only. Redistribution, commercial use, or
+              reproduction without permission is prohibited.{' '}
+              <span
+                onClick={() => navigate({ to: '/admin' })}
+                className="cursor-pointer text-gray-600 dark:text-gray-400 text-sm font-normal no-underline select-none"
+                style={{ textDecoration: 'none' }}
+                aria-hidden="true"
+              >
+                Sia
+              </span>
+            </p>
+          </div>
         </div>
 
         <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
@@ -87,6 +102,12 @@ export default function TermsPage() {
             </button>
             .
           </p>
+        </div>
+
+        <div className="mt-6 text-center">
+          <span className="text-xs text-gray-300 dark:text-gray-700">
+            v1.0 &copy; {new Date().getFullYear()} StudyHub
+          </span>
         </div>
       </div>
     </div>

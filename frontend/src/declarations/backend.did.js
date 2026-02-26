@@ -50,7 +50,6 @@ export const idlService = IDL.Service({
   'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
   'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
   'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
-  'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
@@ -98,7 +97,6 @@ export const idlFactory = ({ IDL }) => {
     'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
     'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
     'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
-    'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], []),
   });
 };
 

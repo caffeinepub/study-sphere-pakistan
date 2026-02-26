@@ -28,9 +28,8 @@ import { mapBackendChapter, mapBackendPdfEntry } from '../utils/chapterMapper';
 import type { Chapter, PdfEntry } from '../types/chapter';
 import ChapterForm from '../components/ChapterForm';
 import PdfEntryForm from '../components/PdfEntryForm';
-import AdminAuthGuard from '../components/AdminAuthGuard';
 
-function AdminPanelContent() {
+export default function AdminPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('chapters');
   const [showChapterForm, setShowChapterForm] = useState(false);
@@ -150,70 +149,61 @@ function AdminPanelContent() {
               </div>
             )}
 
-            {!chaptersLoading && !chaptersError && (
-              <div className="space-y-2">
-                {chapters.map((ch) => (
+            {!chaptersLoading && !chaptersError && chapters.length > 0 && (
+              <div className="space-y-3">
+                {chapters.map(chapter => (
                   <div
-                    key={ch.id}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border"
+                    key={chapter.id}
+                    className="flex items-center justify-between bg-card border border-border rounded-lg px-4 py-3 shadow-sm"
                   >
-                    <BookOpen className="w-4 h-4 text-primary shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{ch.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Class {ch.classNumber} · {ch.subject}
+                      <p className="font-medium text-foreground truncate">{chapter.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Class {chapter.classNumber} · {chapter.subject}
                       </p>
                     </div>
-                    <div className="flex gap-1 shrink-0">
-                      {ch.notesUrl && <Badge variant="outline" className="text-xs">Notes</Badge>}
-                      {ch.audioUrl && <Badge variant="outline" className="text-xs">Audio</Badge>}
-                      {ch.quizQuestions.length > 0 && (
-                        <Badge variant="outline" className="text-xs">{ch.quizQuestions.length}Q</Badge>
-                      )}
-                      {ch.flashcards.length > 0 && (
-                        <Badge variant="outline" className="text-xs">{ch.flashcards.length}F</Badge>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditingChapter(ch)}
-                      className="shrink-0"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Chapter</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{ch.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteChapter(ch.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    <div className="flex items-center gap-2 ml-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingChapter(chapter)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive"
                           >
-                            {deleteChapterMutation.isPending ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              'Delete'
-                            )}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Chapter</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{chapter.title}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteChapter(chapter.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {deleteChapterMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                'Delete'
+                              )}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -223,7 +213,7 @@ function AdminPanelContent() {
           {/* PDF Entries Tab */}
           <TabsContent value="pdfs">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-foreground">PDF Entries</h2>
+              <h2 className="text-lg font-semibold text-foreground">All PDF Entries</h2>
               <Button onClick={() => setShowPdfForm(true)} className="flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 Add PDF Entry
@@ -232,7 +222,7 @@ function AdminPanelContent() {
 
             {pdfsLoading && (
               <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
+                {[...Array(4)].map((_, i) => (
                   <Skeleton key={i} className="h-16 w-full rounded-lg" />
                 ))}
               </div>
@@ -252,60 +242,59 @@ function AdminPanelContent() {
               </div>
             )}
 
-            {!pdfsLoading && !pdfsError && (
-              <div className="space-y-2">
-                {pdfEntries.map((entry) => (
+            {!pdfsLoading && !pdfsError && pdfEntries.length > 0 && (
+              <div className="space-y-3">
+                {pdfEntries.map(entry => (
                   <div
                     key={entry.id}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border"
+                    className="flex items-center justify-between bg-card border border-border rounded-lg px-4 py-3 shadow-sm"
                   >
-                    <FileText className="w-4 h-4 text-primary shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground truncate">{entry.title}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {entry.entryType === 'past-paper' ? 'Past Paper' : 'Practice Test'}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">{entry.entryType}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditingPdf(entry)}
-                      className="shrink-0"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete PDF Entry</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{entry.title}"?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeletePdf(entry.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    <div className="flex items-center gap-2 ml-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingPdf(entry)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive"
                           >
-                            {deletePdfMutation.isPending ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              'Delete'
-                            )}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete PDF Entry</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{entry.title}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeletePdf(entry.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {deletePdfMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                'Delete'
+                              )}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -314,13 +303,5 @@ function AdminPanelContent() {
         </Tabs>
       </main>
     </div>
-  );
-}
-
-export default function AdminPage() {
-  return (
-    <AdminAuthGuard>
-      <AdminPanelContent />
-    </AdminAuthGuard>
   );
 }

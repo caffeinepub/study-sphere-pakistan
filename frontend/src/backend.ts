@@ -130,7 +130,6 @@ export interface backendInterface {
     getChapter(id: bigint): Promise<Chapter | null>;
     updateChapter(id: bigint, input: ChapterInput): Promise<boolean>;
     updatePdfEntry(id: bigint, input: PdfEntryInput): Promise<boolean>;
-    verifyAdminPassword(passwordHash: string): Promise<boolean>;
 }
 import type { Chapter as _Chapter } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -258,20 +257,6 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updatePdfEntry(arg0, arg1);
-            return result;
-        }
-    }
-    async verifyAdminPassword(arg0: string): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.verifyAdminPassword(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.verifyAdminPassword(arg0);
             return result;
         }
     }

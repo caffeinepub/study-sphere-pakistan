@@ -1,17 +1,23 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T23:13:14.155Z",
-  "summary": "All four requirements (REQ-37, REQ-38, REQ-39, REQ-40) appear to be implemented in the diff. The hashPassword utility uses SubtleCrypto SHA-256 with TextEncoder and hex conversion. The backend main.mo stores the correct hash. migration.mo is newly added with the correct hash value. AdminAuthGuard passes the raw password directly to hashPassword without transformation.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-26T04:48:40.744Z",
+  "summary": "The diff implements REQ-46 by updating TermsPage.tsx to add a 'Sia' word at the end of the last condition (Copyright section) that navigates to /admin when clicked. The implementation appears to match the core requirements including styling to blend with surrounding text and navigation to /admin.",
+  "missing_requirements": [
+    {
+      "id": "REQ-46",
+      "requirement": "The hidden link works correctly in both light mode and dark mode.",
+      "reason": "The span uses className 'text-gray-600 dark:text-gray-400' which handles both light and dark mode color matching. However, the style attribute appears truncated in the diff ('style={{ text...') and it is unclear whether inline styles might override or conflict with the dark mode Tailwind classes, preventing full verification of this acceptance criterion.",
+      "evidence": [
+        "frontend/src/pages/TermsPage.tsx"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.95,
+  "confidence": 0.8,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/AdminAuthGuard.tsx",
-    "frontend/src/utils/hashPassword.ts",
+    "frontend/src/pages/TermsPage.tsx",
     "project_state.json"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
-  "summary": "Study Sphere Pakistan — a fully responsive, PWA-enabled educational website for Pakistani students (9th–12th class + MDCAT prep). Features include animated splash screen, class/subject/chapter navigation, admin panel at /admin URL protected by password prompt (password: qwet1234, verified against Motoko canister hash, session-based auth via sessionStorage) for uploading/editing/deleting chapters with manual entry forms for quizzes and flashcards, Google Drive notes embed, HTML5 audio player, interactive MCQ quiz, 3D flip flashcards, progress tracking, recently viewed, MDCAT prep section, Terms & Conditions, Support Us page (Easypaisa: 03320335528), dark mode toggle, and PWA/offline support. Chapters and all uploaded material (quiz, flashcards, notes URL, audio URL) are stored permanently in a Motoko backend canister on the Internet Computer for cross-device sync. User-specific data (progress, recently viewed) remains device-local in LocalStorage.",
+  "projectStateVersion": 25,
+  "summary": "Study Sphere Pakistan — a fully responsive, PWA-enabled educational website for Pakistani students (9th–12th class + MDCAT prep). Features include animated splash screen, class/subject/chapter navigation, admin panel at /admin URL (open-access, no password) with entry point hidden inside the Terms & Conditions page as the subtle word 'Sia' at the end of the last condition — clicking it navigates to /admin, upload/edit/delete chapters with manual entry forms for quizzes and flashcards, Google Drive notes embed, HTML5 audio player, interactive MCQ quiz, 3D flip flashcards, progress tracking, recently viewed, MDCAT prep section, Terms & Conditions, Support Us page (Easypaisa: 03320335528), dark mode toggle, and PWA/offline support. Chapters and all uploaded material (quiz, flashcards, notes URL, audio URL) are stored permanently in a Motoko backend canister on the Internet Computer for cross-device sync. User-specific data (progress, recently viewed) remains device-local in LocalStorage.",
   "architectural_notes": [
     "PWA with service worker for offline support and installability",
     "Medical/academic theme: blue, white, soft gradients; mobile-first responsive design",
@@ -9,12 +9,10 @@
     "Chapter data (title, class, subject, notes URL, audio URL, quiz, flashcards) stored permanently in a Motoko canister on the Internet Computer — replaces LocalStorage for chapter persistence",
     "Cross-device sync: all devices fetch chapters from the shared canister in real time; user progress and recently viewed remain device-local in LocalStorage",
     "Favorites feature removed entirely — no per-user saved favorites",
-    "Admin panel at /admin now requires password entry — password hash stored in Motoko canister, verified server-side; session auth stored in sessionStorage (browser session only)"
+    "Admin panel access is security-through-obscurity: no password, entry point hidden as a subtle element inside the Terms & Conditions page"
   ],
-  "known_issues": [
-    "Admin password prompt at /admin returns 'Incorrect password' for correct password 'qwet1234' — SHA-256 hash mismatch between frontend and canister stored hash"
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-an-animated-splash-screen-that-displays-the-study-sphere-pakistan-logo-centered-on-screen-fades-in-on-load-stays-visible-for-3-seconds-then-fades-out-and-automatically-redirects-to-the-homepage-use-smooth-css-opacity-transitions",
@@ -287,6 +285,46 @@
         "REQ-40"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-the-adminauthguard-component-entirely-from-the-frontend-the-admin-route-must-render-adminpage-directly-with-no-password-prompt-no-sessionstorage-authentication-check-and-no-login-screen-the-admin-panel-ui-and-functionality-must-remain-completely-unchanged",
+      "title": "Remove the AdminAuthGuard component entirely from the frontend. The /admin route must render AdminPage directly with no password prompt, no sessionStorage authentication check, and no login screen. The admin panel UI and functionality must remain completely unchanged.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-hashpassword-ts-utility-file-and-all-imports-usages-of-it-throughout-the-frontend-codebase-since-password-hashing-is-no-longer-needed",
+      "title": "Remove the hashPassword.ts utility file and all imports/usages of it throughout the frontend codebase, since password hashing is no longer needed.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-subtle-inconspicuous-admin-entry-point-hidden-inside-the-terms-conditions-page-frontend-src-pages-termspage-tsx-it-must-be-a-small-discreet-clickable-element-such-as-a-tiny-icon-a-period-symbol-at-the-end-of-a-paragraph-or-a-lightly-styled-text-link-that-blends-into-the-page-content-that-navigates-to-admin-when-clicked-it-must-not-be-labeled-admin-must-not-stand-out-visually-and-must-not-appear-in-the-site-s-main-navigation-or-footer-the-rest-of-the-termspage-content-must-remain-unchanged",
+      "title": "Add a subtle, inconspicuous admin entry point hidden inside the Terms & Conditions page (frontend/src/pages/TermsPage.tsx). It must be a small, discreet clickable element — such as a tiny icon, a period/symbol at the end of a paragraph, or a lightly styled text link that blends into the page content — that navigates to /admin when clicked. It must not be labeled 'Admin', must not stand out visually, and must not appear in the site's main navigation or footer. The rest of the TermsPage content must remain unchanged.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-admin-icon-button-from-the-header-component-frontend-src-components-header-tsx-if-one-exists-so-there-is-no-visible-shortcut-to-admin-in-the-site-navigation",
+      "title": "Remove the admin icon button from the Header component (frontend/src/components/Header.tsx) if one exists, so there is no visible shortcut to /admin in the site navigation.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-termspage-tsx-update-the-hidden-admin-entry-point-so-that-the-word-sia-appears-as-the-very-last-word-of-the-last-condition-paragraph-on-the-page-style-it-to-blend-naturally-into-the-surrounding-body-text-same-font-size-same-color-no-underline-by-default-so-it-is-not-visually-distinct-clicking-sia-must-navigate-to-admin-all-other-terms-conditions-content-must-remain-completely-unchanged",
+      "title": "In frontend/src/pages/TermsPage.tsx, update the hidden admin entry point so that the word 'Sia' appears as the very last word of the last condition/paragraph on the page. Style it to blend naturally into the surrounding body text (same font size, same color, no underline by default) so it is not visually distinct. Clicking 'Sia' must navigate to /admin. All other Terms & Conditions content must remain completely unchanged.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -405,33 +443,23 @@
       "status": "pending"
     },
     {
-      "id": "AR-19",
-      "summary": "Add password protection to /admin panel — password prompt screen on entry, password 'qwet1234' verified against hash stored in Motoko canister (never exposed in frontend), session-based auth via sessionStorage (cleared on tab/browser close), panel unchanged after login",
+      "id": "AR-24",
+      "summary": "Remove password protection from /admin entirely — no AdminAuthGuard, no password prompt, no hashPassword.ts, no verifyAdminPassword canister calls. Hide the admin panel entry point inside the Terms & Conditions page as a subtle/inconspicuous element (e.g., hidden link or discreet tap area). Admin panel opens immediately and is fully unchanged once accessed.",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-20",
-      "summary": "Add a `verifyAdminPassword(passwordHash: Text) -> async Bool` function to the Motoko backend actor in `backend/main.mo`. Store the SHA-256 hash of the password `qwet1234` as a stable variable. The function must accept a hash string from the frontend and return `true` only if it matches the stored hash. The raw password must never be stored or returned by any canister function.",
+      "id": "AR-27",
+      "summary": "Remove the verifyAdminPassword function from backend/main.mo and the associated stable variable storing the admin password hash. Also remove the corresponding migration logic in backend/migration.mo that sets the adminPasswordHash.",
       "reqIds": [
-        "REQ-34"
+        "REQ-43"
       ],
       "status": "pending"
     },
     {
-      "id": "AR-22",
-      "summary": "Update `backend/main.mo` to store the correct SHA-256 hex hash of the password `qwet1234` in the stable variable used by `verifyAdminPassword`. The stored hash must be exactly `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` (64 lowercase hex characters). The `verifyAdminPassword(passwordHash: Text) -> async Bool` function must perform a strict equality comparison between the incoming `passwordHash` argument and this stored value, returning `true` only on an exact match.",
-      "reqIds": [
-        "REQ-38"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-23",
-      "summary": "Update `backend/migration.mo` to set the `adminPasswordHash` stable variable to the correct value `6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e` so that the migration overwrites any previously stored incorrect hash on canister upgrade.",
-      "reqIds": [
-        "REQ-39"
-      ],
+      "id": "AR-28",
+      "summary": "Update TermsPage so the word 'Sia' appears as the last word of the last condition, subtly styled to blend in, and clicking it navigates to /admin",
+      "reqIds": [],
       "status": "pending"
     }
   ],

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from '@tanstack/react-router';
-import { Moon, Sun, Menu, X, BookOpen, Shield } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
+import { Moon, Sun, Menu, X, BookOpen } from 'lucide-react';
 import { useDarkMode } from '../App';
 
 export default function Header() {
@@ -53,15 +53,6 @@ export default function Header() {
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            {/* Admin link */}
-            <button
-              onClick={() => navigate({ to: '/admin' })}
-              className="hidden md:flex p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-              aria-label="Admin"
-            >
-              <Shield className="w-5 h-5" />
-            </button>
-
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -88,15 +79,6 @@ export default function Header() {
                 {link.label}
               </button>
             ))}
-            <button
-              onClick={() => {
-                navigate({ to: '/admin' });
-                setMenuOpen(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-            >
-              Admin
-            </button>
           </div>
         )}
       </div>

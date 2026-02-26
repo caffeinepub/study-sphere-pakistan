@@ -3,9 +3,9 @@ import Nat "mo:core/Nat";
 import Array "mo:core/Array";
 import Time "mo:core/Time";
 import Text "mo:core/Text";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   public type Chapter = {
     id : Nat;
@@ -47,9 +47,6 @@ actor {
 
   let chapters = Map.empty<Nat, Chapter>();
   let pdfEntries = Map.empty<Nat, PdfEntry>();
-
-  // Correct SHA-256 hash for 'qwet1234'
-  let adminPasswordHash = "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e";
 
   public shared ({ caller }) func addChapter(input : ChapterInput) : async Nat {
     let id = nextChapterId;
@@ -105,10 +102,6 @@ actor {
 
   public query ({ caller }) func getAllChapters() : async [Chapter] {
     chapters.values().toArray();
-  };
-
-  public func verifyAdminPassword(passwordHash : Text) : async Bool {
-    adminPasswordHash == passwordHash;
   };
 
   public shared ({ caller }) func addPdfEntry(input : PdfEntryInput) : async Nat {

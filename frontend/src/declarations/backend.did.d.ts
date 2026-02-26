@@ -51,7 +51,6 @@ export interface _SERVICE {
   'getChapter' : ActorMethod<[bigint], [] | [Chapter]>,
   'updateChapter' : ActorMethod<[bigint, ChapterInput], boolean>,
   'updatePdfEntry' : ActorMethod<[bigint, PdfEntryInput], boolean>,
-  'verifyAdminPassword' : ActorMethod<[string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
