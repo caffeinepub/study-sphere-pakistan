@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
   BookOpen, FileText, FlaskConical, Atom, Brain, Languages,
-  Plus, Trash2, Loader2, AlertCircle, ExternalLink,
+  Trash2, Loader2, AlertCircle, ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
@@ -19,7 +18,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useGetAllPdfEntries, useDeletePdfEntry } from '../hooks/useQueries';
-import { mapBackendPdfEntry } from '../utils/chapterMapper';
 import type { PdfEntry } from '../types/chapter';
 
 const subjects = [
@@ -32,20 +30,16 @@ const subjects = [
 
 export default function MDCATPage() {
   const navigate = useNavigate();
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newType, setNewType] = useState<'past-paper' | 'practice-test'>('past-paper');
-  const [newUrl, setNewUrl] = useState('');
 
-  const { data: backendEntries, isLoading, isError } = useGetAllPdfEntries();
+  const { data: pdfData, isLoading, isError } = useGetAllPdfEntries();
   const deletePdfMutation = useDeletePdfEntry();
 
-  const pdfEntries: PdfEntry[] = (backendEntries ?? []).map(mapBackendPdfEntry);
+  const pdfEntries: PdfEntry[] = pdfData ?? [];
   const pastPapers = pdfEntries.filter((e) => e.entryType === 'past-paper');
   const practiceTests = pdfEntries.filter((e) => e.entryType === 'practice-test');
 
   const handleDelete = async (id: string) => {
-    await deletePdfMutation.mutateAsync(BigInt(id));
+    await deletePdfMutation.mutateAsync(id);
   };
 
   return (
@@ -148,7 +142,11 @@ export default function MDCATPage() {
                           onClick={() => handleDelete(entry.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          {deletePdfMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
+                          {deletePdfMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            'Delete'
+                          )}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -209,7 +207,11 @@ export default function MDCATPage() {
                           onClick={() => handleDelete(entry.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          {deletePdfMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
+                          {deletePdfMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            'Delete'
+                          )}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

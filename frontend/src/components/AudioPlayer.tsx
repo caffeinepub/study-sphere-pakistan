@@ -1,10 +1,17 @@
-import { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, AlertCircle, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Play, Pause, Volume2, VolumeX, ExternalLink, AlertCircle } from "lucide-react";
 
 interface AudioPlayerProps {
-  url?: string;
+  url: string;
+}
+
+function formatTime(seconds: number): string {
+  if (!isFinite(seconds) || isNaN(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export default function AudioPlayer({ url }: AudioPlayerProps) {
@@ -16,197 +23,164 @@ export default function AudioPlayer({ url }: AudioPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  // Reset error state and playback when URL changes
+  // Reset state when URL changes
   useEffect(() => {
-    setHasError(false);
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
+    setHasError(false);
   }, [url]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onDurationChange = () => {
-      if (isFinite(audio.duration)) setDuration(audio.duration);
-    };
-    const onEnded = () => setIsPlaying(false);
-    const onError = () => setHasError(true);
-    const onCanPlay = () => setHasError(false);
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('durationchange', onDurationChange);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', onError);
-    audio.addEventListener('canplay', onCanPlay);
-    return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('durationchange', onDurationChange);
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', onError);
-      audio.removeEventListener('canplay', onCanPlay);
-    };
-  }, [url]);
-
-  const togglePlay = () => {
+  const handlePlayPause = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) {
       audio.pause();
-      setIsPlaying(false);
     } else {
-      audio.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        setHasError(true);
-        setIsPlaying(false);
-      });
+      audio.play().catch(() => setHasError(true));
     }
+  };
+
+  const handleTimeUpdate = () => {
+    const audio = audioRef.current;
+    if (audio) setCurrentTime(audio.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    const audio = audioRef.current;
+    if (audio) setDuration(audio.duration);
   };
 
   const handleSeek = (value: number[]) => {
     const audio = audioRef.current;
-    if (!audio) return;
-    audio.currentTime = value[0];
-    setCurrentTime(value[0]);
+    if (audio) {
+      audio.currentTime = value[0];
+      setCurrentTime(value[0]);
+    }
   };
 
-  const handleVolume = (value: number[]) => {
+  const handleVolumeChange = (value: number[]) => {
+    const audio = audioRef.current;
+    const vol = value[0];
+    setVolume(vol);
+    if (audio) {
+      audio.volume = vol;
+      audio.muted = vol === 0;
+    }
+    setIsMuted(vol === 0);
+  };
+
+  const handleMuteToggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    const v = value[0];
-    audio.volume = v;
-    setVolume(v);
-    setIsMuted(v === 0);
+    const newMuted = !isMuted;
+    audio.muted = newMuted;
+    setIsMuted(newMuted);
   };
 
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
+  const handleEnded = () => setIsPlaying(false);
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleError = () => setHasError(true);
 
-  const formatTime = (s: number) => {
-    if (!isFinite(s) || isNaN(s)) return '0:00';
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
-
-  if (!url) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-          <Music className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-        </div>
-        <h3 className="text-lg font-heading font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          No Audio Available
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400">
-          Audio lecture hasn't been uploaded for this chapter yet.
-        </p>
-      </div>
-    );
-  }
+  // For blob URLs, don't show external link (they're not shareable)
+  const isBlobUrl = url.startsWith("blob:");
+  const isExternalUrl = !isBlobUrl && (url.startsWith("http://") || url.startsWith("https://"));
 
   if (hasError) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4">
-          <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
+      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 flex flex-col items-center gap-3 text-center">
+        <AlertCircle className="h-10 w-10 text-destructive opacity-70" />
+        <div>
+          <p className="font-medium text-foreground">Unable to load audio</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            The audio file could not be played in your browser.
+          </p>
         </div>
-        <h3 className="text-lg font-heading font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          Unable to Load Audio
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">
-          The browser could not play this audio link directly. Try opening it externally.
-        </p>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary dark:bg-blue-600 text-white text-sm font-medium hover:bg-primary/90 dark:hover:bg-blue-700 transition-colors"
-        >
-          <ExternalLink className="w-4 h-4" />
-          Open Audio Link
-        </a>
+        {isExternalUrl && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Open Audio Link
+          </a>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto">
-      {/* Pass URL directly to audio element — no pre-validation */}
-      <audio ref={audioRef} src={url} preload="metadata" />
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-        {/* Icon */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="w-24 h-24 rounded-full bg-primary dark:bg-blue-600 flex items-center justify-center shadow-lg">
-            <Music className="w-10 h-10 text-white" />
-          </div>
-        </div>
-        <p className="text-center font-heading font-semibold text-lg text-gray-900 dark:text-white mb-6">
-          Audio Lecture
-        </p>
+    <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+      <audio
+        ref={audioRef}
+        src={url}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleEnded}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onError={handleError}
+        preload="metadata"
+      />
 
-        {/* Progress */}
-        <div className="mb-4">
+      {/* Play/Pause + Time */}
+      <div className="flex items-center gap-4">
+        <Button
+          variant="default"
+          size="icon"
+          onClick={handlePlayPause}
+          className="h-12 w-12 rounded-full shrink-0"
+        >
+          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+        </Button>
+
+        <div className="flex-1 space-y-1">
           <Slider
             value={[currentTime]}
-            max={duration || 100}
+            min={0}
+            max={duration || 1}
             step={0.1}
             onValueChange={handleSeek}
-            className="mb-2"
+            className="w-full"
           />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
         </div>
+      </div>
 
-        {/* Play/Pause */}
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <Button
-            onClick={togglePlay}
-            size="lg"
-            className="w-14 h-14 rounded-full p-0 bg-primary dark:bg-blue-600 hover:bg-primary/90 dark:hover:bg-blue-700 text-white"
-          >
-            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
-          </Button>
-        </div>
-
-        {/* Volume */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleMute}
-            className="rounded-xl shrink-0 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </Button>
-          <Slider
-            value={[isMuted ? 0 : volume]}
-            max={1}
-            step={0.01}
-            onValueChange={handleVolume}
-            className="flex-1"
-          />
-        </div>
-
-        {/* External link fallback */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
+      {/* Volume */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={handleMuteToggle} className="h-8 w-8 shrink-0">
+          {isMuted || volume === 0 ? (
+            <VolumeX className="h-4 w-4" />
+          ) : (
+            <Volume2 className="h-4 w-4" />
+          )}
+        </Button>
+        <Slider
+          value={[isMuted ? 0 : volume]}
+          min={0}
+          max={1}
+          step={0.01}
+          onValueChange={handleVolumeChange}
+          className="w-28"
+        />
+        {isExternalUrl && (
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-blue-400 transition-colors"
+            className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="h-3 w-3" />
             Open in browser
           </a>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -10,26 +10,45 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Chapter {
-  'id' : bigint,
-  'title' : string,
-  'classNumber' : string,
-  'subject' : string,
-  'createdAt' : bigint,
-  'audioUrl' : string,
-  'notesUrl' : string,
-  'quizQuestions' : string,
-  'flashcards' : string,
-}
 export interface ChapterInput {
   'title' : string,
+  'notesLabel1' : string,
+  'notesLabel2' : string,
+  'audioLabel1' : string,
+  'audioLabel2' : string,
   'classNumber' : string,
+  'notesUrl1' : string,
+  'notesUrl2' : string,
   'subject' : string,
+  'audioMimeType2' : string,
+  'audioMimeType' : string,
   'audioUrl' : string,
   'notesUrl' : string,
   'quizQuestions' : string,
   'flashcards' : string,
 }
+export interface ChapterSnapshot {
+  'id' : bigint,
+  'title' : string,
+  'notesLabel1' : string,
+  'notesLabel2' : string,
+  'audioLabel1' : string,
+  'audioLabel2' : string,
+  'classNumber' : string,
+  'notesUrl1' : string,
+  'notesUrl2' : string,
+  'subject' : string,
+  'audioMimeType2' : string,
+  'createdAt' : bigint,
+  'audioBlob2' : [] | [ExternalBlob],
+  'audioMimeType' : string,
+  'audioBlob' : [] | [ExternalBlob],
+  'audioUrl' : string,
+  'notesUrl' : string,
+  'quizQuestions' : string,
+  'flashcards' : string,
+}
+export type ExternalBlob = Uint8Array;
 export interface PdfEntry {
   'id' : bigint,
   'url' : string,
@@ -41,16 +60,56 @@ export interface PdfEntryInput {
   'title' : string,
   'entryType' : string,
 }
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'addChapter' : ActorMethod<[ChapterInput], bigint>,
   'addPdfEntry' : ActorMethod<[PdfEntryInput], bigint>,
+  'deleteAudioData' : ActorMethod<[bigint], boolean>,
+  'deleteAudioData2' : ActorMethod<[bigint], boolean>,
   'deleteChapter' : ActorMethod<[bigint], boolean>,
   'deletePdfEntry' : ActorMethod<[bigint], boolean>,
-  'getAllChapters' : ActorMethod<[], Array<Chapter>>,
+  'finalizeAudioUpload' : ActorMethod<[bigint, bigint], boolean>,
+  'finalizeAudioUpload2' : ActorMethod<[bigint, bigint], boolean>,
+  'getAllChapters' : ActorMethod<[], Array<ChapterSnapshot>>,
   'getAllPdfEntries' : ActorMethod<[], Array<PdfEntry>>,
-  'getChapter' : ActorMethod<[bigint], [] | [Chapter]>,
+  'getAudioData' : ActorMethod<[bigint], [] | [Uint8Array]>,
+  'getAudioData2' : ActorMethod<[bigint], [] | [Uint8Array]>,
+  'getChapter' : ActorMethod<[bigint], [] | [ChapterSnapshot]>,
   'updateChapter' : ActorMethod<[bigint, ChapterInput], boolean>,
   'updatePdfEntry' : ActorMethod<[bigint, PdfEntryInput], boolean>,
+  'uploadAudioChunk' : ActorMethod<
+    [bigint, bigint, bigint, Uint8Array],
+    boolean
+  >,
+  'uploadAudioChunk2' : ActorMethod<
+    [bigint, bigint, bigint, Uint8Array],
+    boolean
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

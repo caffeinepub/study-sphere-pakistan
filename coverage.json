@@ -1,34 +1,142 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T04:48:40.749Z",
+  "generatedAt": "2026-02-27T06:04:39.150Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 9,
+    "implemented": 5,
     "items": [
       {
-        "id": "REQ-46",
-        "summary": "In frontend/src/pages/TermsPage.tsx, update the hidden admin entry point so that the word 'Sia' appears as the very last word of the last condition/paragraph on the page. Style it to blend naturally into the surrounding body text (same font size, same color, no underline by default) so it is not visually distinct. Clicking 'Sia' must navigate to /admin. All other Terms & Conditions content must remain completely unchanged.",
+        "id": "REQ-52",
+        "summary": "Extend the Motoko backend Chapter record in backend/main.mo to add the following new fields: notesUrl1 (Text), notesLabel1 (Text), notesUrl2 (Text), notesLabel2 (Text), audioLabel1 (Text), audioLabel2 (Text), audioMimeType2 (Text). Add four new stable-storage chunked audio functions for a second audio binary: uploadAudioChunk2(chapterId: Nat, chunkIndex: Nat, totalChunks: Nat, data: Blob) -> async Bool, finalizeAudioUpload2(chapterId: Nat, totalChunks: Nat) -> async Bool, getAudioData2(chapterId: Nat) -> async ?Blob, deleteAudioData2(chapterId: Nat) -> async Bool. All new audio data must be stored in stable variables so it survives canister upgrades. Existing fields (notesUrl, audioUrl, audioMimeType, uploadAudioChunk, finalizeAudioUpload, getAudioData, deleteAudioData) must remain intact and unchanged for backwards compatibility.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-53",
+        "summary": "Update backend/migration.mo to migrate existing Chapter records to the new schema by adding default empty string values for notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, and audioMimeType2 on any chapter that lacks these fields.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-54",
+        "summary": "Update the frontend TypeScript Chapter interface in frontend/src/types/chapter.ts to add the optional fields: notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 (all string or optional string). Update chapterMapper.ts to map these new backend fields to the frontend Chapter type.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/TermsPage.tsx"
+          "frontend/src/types/chapter.ts",
+          "frontend/src/utils/chapterMapper.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/TermsPage.tsx"
+          "frontend/src/types/chapter.ts",
+          "frontend/src/utils/chapterMapper.ts"
+        ]
+      },
+      {
+        "id": "REQ-55",
+        "summary": "Update frontend/src/utils/audioUploadService.ts to add a second upload utility function (e.g. uploadAudioFile2) that performs chunked upload for the second audio slot using uploadAudioChunk2 and finalizeAudioUpload2 canister functions, with the same chunk size (1.5MB max), sequential upload, progress callback (0–100%), and promise-based completion/error handling as the existing first audio upload utility.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/utils/audioUploadService.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-56",
+        "summary": "Update the Admin Panel's ChapterForm (frontend/src/components/ChapterForm.tsx) to replace the single notes URL input and single audio upload input with two notes URL inputs and two audio file upload inputs. Each notes URL input must have an adjacent optional label text field (placeholder: 'Notes 1 Label' and 'Notes 2 Label'). Each audio file upload input must have an adjacent optional label text field (placeholder: 'Audio 1 Label' and 'Audio 2 Label'). When editing a chapter that already has audio stored for slot 2 (hasAudio2), show 'Audio file uploaded' status and allow uploading a replacement. Both audio uploads must show individual progress bars (0–100%) during upload and individual success/error messages. On Save for a new chapter: create the chapter first, then upload audio file 1 (if selected) via uploadAudioFile, then upload audio file 2 (if selected) via uploadAudioFile2. On Save for an edit: upload whichever audio files have been newly selected. All four fields (both notes URLs and both audio files) remain optional — saving a chapter with only a title must still work.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ChapterForm.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ChapterForm.tsx"
+        ]
+      },
+      {
+        "id": "REQ-57",
+        "summary": "Update the Chapter page Notes tab (frontend/src/pages/ChapterPage.tsx) and the NotesViewer component (frontend/src/components/NotesViewer.tsx) so that when a chapter has one or two notes URLs, the Notes tab shows named buttons/cards for each available notes link using the admin-entered label (notesLabel1 / notesLabel2), falling back to 'Notes 1' / 'Notes 2' if no label is provided. Clicking a named button opens or embeds that notes URL in the viewer. If only one notes URL is present, show only one button. If neither is present, show the existing empty-state UI.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ChapterPage.tsx",
+          "frontend/src/components/NotesViewer.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ChapterPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-58",
+        "summary": "Update the Chapter page Audio tab (frontend/src/pages/ChapterPage.tsx) and the AudioPlayer component (frontend/src/components/AudioPlayer.tsx) so that when a chapter has one or two audio files stored in the canister, the Audio tab shows named buttons/cards for each available audio item using the admin-entered label (audioLabel1 / audioLabel2), falling back to 'Audio 1' / 'Audio 2'. Clicking a named button fetches the corresponding audio binary from the canister (getAudioData for slot 1, getAudioData2 for slot 2), converts it to an object URL via URL.createObjectURL, and passes it to the AudioPlayer for playback. Revoke the object URL on component unmount. If neither audio slot has data but a legacy audioUrl string exists, fall back to audioUrl. If no audio is available at all, show the existing 'No audio available' UI.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ChapterPage.tsx",
+          "frontend/src/components/AudioPlayer.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ChapterPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-59",
+        "summary": "Implement optimistic UI updates for chapter save operations in the admin panel. When the admin submits the ChapterForm to create or update a chapter, immediately update the TanStack Query cache with the new/edited chapter data on the frontend before the canister write completes. If the canister write fails, revert the cache to the previous state and display an error message. This eliminates the perceived save delay so the chapter list appears to update instantly.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-60",
+        "summary": "Perform a full color contrast audit and fix across all frontend components and pages in both light and dark mode. Every text element must have sufficient contrast against its background. Specifically fix: button labels on gradient/colored backgrounds, card text on colored card backgrounds, tab labels (active and inactive) in both modes, form input labels and placeholder text, flashcard front/back text, quiz option text and selected-state text, chapter list item text, admin panel form fields and section headers, recently viewed section text, empty-state messages, progress indicators, and any other element where text color matches or is too close to the background color. Use Tailwind's dark: variant classes and ensure all fixes apply correctly when the 'dark' class is present on the document root.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/Footer.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/pages/ClassPage.tsx",
+          "frontend/src/pages/SubjectPage.tsx",
+          "frontend/src/pages/MDCATPage.tsx",
+          "frontend/src/pages/MDCATSubjectPage.tsx",
+          "frontend/src/pages/ChapterPage.tsx",
+          "frontend/src/pages/AdminPage.tsx",
+          "frontend/src/components/ChapterForm.tsx",
+          "frontend/src/components/FlashcardSection.tsx",
+          "frontend/src/components/QuizSection.tsx",
+          "frontend/src/components/AudioPlayer.tsx",
+          "frontend/src/components/NotesViewer.tsx",
+          "frontend/src/components/SplashScreen.tsx",
+          "frontend/src/pages/SupportPage.tsx",
+          "frontend/src/pages/TermsPage.tsx",
+          "frontend/src/components/ChapterCard.tsx",
+          "frontend/src/components/PdfEntryForm.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ChapterPage.tsx",
+          "frontend/src/components/ChapterForm.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/TermsPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/ChapterForm.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/pages/ChapterPage.tsx",
+    "frontend/src/types/chapter.ts",
+    "frontend/src/utils/chapterMapper.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

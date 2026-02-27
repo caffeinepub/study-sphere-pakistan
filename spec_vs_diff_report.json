@@ -1,23 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T04:48:40.744Z",
-  "summary": "The diff implements REQ-46 by updating TermsPage.tsx to add a 'Sia' word at the end of the last condition (Copyright section) that navigates to /admin when clicked. The implementation appears to match the core requirements including styling to blend with surrounding text and navigation to /admin.",
+  "generatedAt": "2026-02-27T06:04:39.144Z",
+  "summary": "The diff implements most of the required features including backend extensions (REQ-52, REQ-53), frontend type updates (REQ-54), ChapterForm dual inputs (REQ-56), ChapterPage dual notes/audio UI (REQ-57, REQ-58), and type/mapper updates. However, REQ-55 (audioUploadService.ts uploadAudioFile2 function), REQ-59 (optimistic UI updates), and REQ-60 (full color contrast audit) are not evidenced in the diff.",
   "missing_requirements": [
     {
-      "id": "REQ-46",
-      "requirement": "The hidden link works correctly in both light mode and dark mode.",
-      "reason": "The span uses className 'text-gray-600 dark:text-gray-400' which handles both light and dark mode color matching. However, the style attribute appears truncated in the diff ('style={{ text...') and it is unclear whether inline styles might override or conflict with the dark mode Tailwind classes, preventing full verification of this acceptance criterion.",
+      "id": "REQ-55",
+      "requirement": "Update frontend/src/utils/audioUploadService.ts to add uploadAudioFile2 function performing chunked upload for the second audio slot using uploadAudioChunk2 and finalizeAudioUpload2 canister functions.",
+      "reason": "The diff does not include any changes to audioUploadService.ts. ChapterForm.tsx imports only 'uploadAudioFileToDataUrl' from audioUploadService, with no reference to uploadAudioFile2 or uploadAudioChunk2/finalizeAudioUpload2.",
       "evidence": [
-        "frontend/src/pages/TermsPage.tsx"
+        "frontend/src/components/ChapterForm.tsx",
+        "frontend/src/utils/audioUploadService.ts"
+      ]
+    },
+    {
+      "id": "REQ-59",
+      "requirement": "Implement optimistic UI updates for chapter save operations in the admin panel using TanStack Query cache — immediately update cache on submit, revert on failure, show error message.",
+      "reason": "No evidence of optimistic UI implementation in the diff. The useQueries.ts file summary mentions CRUD hooks but does not reference onMutate, context rollback, or optimistic cache updates.",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-60",
+      "requirement": "Perform a full color contrast audit and fix across all frontend components and pages in both light and dark mode using Tailwind dark: variant classes.",
+      "reason": "No frontend component files show color contrast changes in the diff. Only backend/main.mo, migration.mo, chapter.ts, chapterMapper.ts, ChapterForm.tsx, and ChapterPage.tsx are listed as modified. No changes to Header, Footer, HomePage, ClassPage, SubjectPage, MDCATPage, MDCATSubjectPage, AdminPage, FlashcardSection, QuizSection, AudioPlayer, NotesViewer, SplashScreen, SupportPage, or TermsPage are present in the diff.",
+      "evidence": [
+        "frontend-file-summaries.txt"
       ]
     }
   ],
   "hallucinated_features": [],
-  "confidence": 0.8,
+  "confidence": 0.82,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/pages/TermsPage.tsx",
+    "frontend/src/components/ChapterForm.tsx",
+    "frontend/src/pages/ChapterPage.tsx",
+    "frontend/src/types/chapter.ts",
+    "frontend/src/utils/chapterMapper.ts",
     "project_state.json"
   ]
 }

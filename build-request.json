@@ -1,40 +1,208 @@
 {
   "kind": "build_request",
-  "title": "Update TermsPage hidden admin link to word 'Sia'",
+  "title": "Dual notes/audio with labels, optimistic UI, and full color contrast fixes",
   "projectName": "Study Sphere Pakistan",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-46",
-      "text": "In frontend/src/pages/TermsPage.tsx, update the hidden admin entry point so that the word 'Sia' appears as the very last word of the last condition/paragraph on the page. Style it to blend naturally into the surrounding body text (same font size, same color, no underline by default) so it is not visually distinct. Clicking 'Sia' must navigate to /admin. All other Terms & Conditions content must remain completely unchanged.",
-      "target": "frontend",
+      "id": "REQ-52",
+      "text": "Extend the Motoko backend Chapter record in backend/main.mo to add the following new fields: notesUrl1 (Text), notesLabel1 (Text), notesUrl2 (Text), notesLabel2 (Text), audioLabel1 (Text), audioLabel2 (Text), audioMimeType2 (Text). Add four new stable-storage chunked audio functions for a second audio binary: uploadAudioChunk2(chapterId: Nat, chunkIndex: Nat, totalChunks: Nat, data: Blob) -> async Bool, finalizeAudioUpload2(chapterId: Nat, totalChunks: Nat) -> async Bool, getAudioData2(chapterId: Nat) -> async ?Blob, deleteAudioData2(chapterId: Nat) -> async Bool. All new audio data must be stored in stable variables so it survives canister upgrades. Existing fields (notesUrl, audioUrl, audioMimeType, uploadAudioChunk, finalizeAudioUpload, getAudioData, deleteAudioData) must remain intact and unchanged for backwards compatibility.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-recent"
         ],
         "quotes": [
-          "make it a small text word Sia at the last conditions last word and by clicking it it shows the admin panel"
+          "Extend the Motoko backend with notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, and chunked upload/finalize/retrieve/delete functions for a second audio binary (uploadAudioChunk2, finalizeAudioUpload2, getAudioData2, deleteAudioData2, audioMimeType2)."
         ]
       },
       "acceptanceCriteria": [
-        "The word 'Sia' is rendered as the last word of the last condition on the Terms & Conditions page.",
-        "The word 'Sia' is styled to visually blend into the surrounding paragraph text — matching font size, color, and weight — with no underline or other distinguishing decoration in its default state.",
-        "Clicking 'Sia' navigates the user directly to /admin without any password prompt or intermediate screen.",
-        "No other text content on the Terms & Conditions page is added, removed, or altered.",
-        "The entry point does not appear in the site header, footer, or any navigation menu.",
-        "The hidden link works correctly in both light mode and dark mode."
+        "backend/main.mo Chapter record includes notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 fields",
+        "uploadAudioChunk2, finalizeAudioUpload2, getAudioData2, deleteAudioData2 functions are implemented and exposed",
+        "All new audio storage uses stable variables that survive canister upgrades",
+        "All existing chapter fields and audio functions remain unchanged"
+      ]
+    },
+    {
+      "id": "REQ-53",
+      "text": "Update backend/migration.mo to migrate existing Chapter records to the new schema by adding default empty string values for notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, and audioMimeType2 on any chapter that lacks these fields.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Extend each chapter to support two notes links and two audio files, each with optional custom admin-entered labels."
+        ]
+      },
+      "acceptanceCriteria": [
+        "migration.mo upgrades OldChapter records to NewChapter by supplying empty-string defaults for all six new text fields",
+        "Canister upgrade does not crash or lose existing chapter data"
+      ]
+    },
+    {
+      "id": "REQ-54",
+      "text": "Update the frontend TypeScript Chapter interface in frontend/src/types/chapter.ts to add the optional fields: notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 (all string or optional string). Update chapterMapper.ts to map these new backend fields to the frontend Chapter type.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Extend each chapter to support two notes links and two audio files, each with optional custom admin-entered labels."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Chapter interface includes notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 as optional string fields",
+        "chapterMapper.ts correctly maps these new fields from canister response to frontend type without breaking existing fields"
+      ]
+    },
+    {
+      "id": "REQ-55",
+      "text": "Update frontend/src/utils/audioUploadService.ts to add a second upload utility function (e.g. uploadAudioFile2) that performs chunked upload for the second audio slot using uploadAudioChunk2 and finalizeAudioUpload2 canister functions, with the same chunk size (1.5MB max), sequential upload, progress callback (0–100%), and promise-based completion/error handling as the existing first audio upload utility.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "chunked upload/finalize/retrieve/delete functions for a second audio binary (uploadAudioChunk2, finalizeAudioUpload2, getAudioData2, deleteAudioData2)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "uploadAudioFile2 function exists in audioUploadService.ts",
+        "It splits the file into chunks of at most 1.5MB",
+        "It calls uploadAudioChunk2 sequentially for each chunk",
+        "It calls finalizeAudioUpload2 after all chunks are sent",
+        "Progress callback fires with percentage 0–100 during upload",
+        "Returns a resolved promise on success and a rejected promise with error message on failure"
+      ]
+    },
+    {
+      "id": "REQ-56",
+      "text": "Update the Admin Panel's ChapterForm (frontend/src/components/ChapterForm.tsx) to replace the single notes URL input and single audio upload input with two notes URL inputs and two audio file upload inputs. Each notes URL input must have an adjacent optional label text field (placeholder: 'Notes 1 Label' and 'Notes 2 Label'). Each audio file upload input must have an adjacent optional label text field (placeholder: 'Audio 1 Label' and 'Audio 2 Label'). When editing a chapter that already has audio stored for slot 2 (hasAudio2), show 'Audio file uploaded' status and allow uploading a replacement. Both audio uploads must show individual progress bars (0–100%) during upload and individual success/error messages. On Save for a new chapter: create the chapter first, then upload audio file 1 (if selected) via uploadAudioFile, then upload audio file 2 (if selected) via uploadAudioFile2. On Save for an edit: upload whichever audio files have been newly selected. All four fields (both notes URLs and both audio files) remain optional — saving a chapter with only a title must still work.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "two notes URL inputs each with an optional label field, two audio file upload inputs each with an optional label field, progress bars, and success/error messages"
+        ]
+      },
+      "acceptanceCriteria": [
+        "ChapterForm shows two notes URL text inputs, each with an optional label text field",
+        "ChapterForm shows two audio file upload inputs (accept audio/*), each with an optional label text field",
+        "Each audio upload shows its own progress bar, success message, and error message",
+        "When editing, chapters with existing audio for slot 1 show 'Audio file uploaded' for slot 1; same for slot 2",
+        "On save, audio uploads are performed sequentially after chapter create/update",
+        "All notes URL and audio fields are optional — chapter with only title saves successfully",
+        "notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2 values are passed to createChapter/updateChapter"
+      ]
+    },
+    {
+      "id": "REQ-57",
+      "text": "Update the Chapter page Notes tab (frontend/src/pages/ChapterPage.tsx) and the NotesViewer component (frontend/src/components/NotesViewer.tsx) so that when a chapter has one or two notes URLs, the Notes tab shows named buttons/cards for each available notes link using the admin-entered label (notesLabel1 / notesLabel2), falling back to 'Notes 1' / 'Notes 2' if no label is provided. Clicking a named button opens or embeds that notes URL in the viewer. If only one notes URL is present, show only one button. If neither is present, show the existing empty-state UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Notes tab shows named buttons for each available notes link using admin labels, falling back to 'Notes 1' / 'Notes 2'",
+          "the audio or notes be shown by names"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Notes tab shows a named button for notesUrl1 using notesLabel1 (fallback: 'Notes 1') when notesUrl1 is present",
+        "Notes tab shows a named button for notesUrl2 using notesLabel2 (fallback: 'Notes 2') when notesUrl2 is present",
+        "Clicking a named button opens/embeds that specific notes URL",
+        "Only available (non-empty) notes links are shown",
+        "If no notes URLs are present, the existing empty-state UI is displayed"
+      ]
+    },
+    {
+      "id": "REQ-58",
+      "text": "Update the Chapter page Audio tab (frontend/src/pages/ChapterPage.tsx) and the AudioPlayer component (frontend/src/components/AudioPlayer.tsx) so that when a chapter has one or two audio files stored in the canister, the Audio tab shows named buttons/cards for each available audio item using the admin-entered label (audioLabel1 / audioLabel2), falling back to 'Audio 1' / 'Audio 2'. Clicking a named button fetches the corresponding audio binary from the canister (getAudioData for slot 1, getAudioData2 for slot 2), converts it to an object URL via URL.createObjectURL, and passes it to the AudioPlayer for playback. Revoke the object URL on component unmount. If neither audio slot has data but a legacy audioUrl string exists, fall back to audioUrl. If no audio is available at all, show the existing 'No audio available' UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Audio tab shows named buttons for each available audio file (falling back to 'Audio 1' / 'Audio 2'). Only available items are shown.",
+          "the audio or notes be shown by names"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Audio tab shows a named button for audio slot 1 using audioLabel1 (fallback: 'Audio 1') when audio data exists for slot 1",
+        "Audio tab shows a named button for audio slot 2 using audioLabel2 (fallback: 'Audio 2') when audio data exists for slot 2",
+        "Clicking a named button fetches that slot's binary audio and plays it via AudioPlayer using an object URL",
+        "Object URLs are revoked on component unmount",
+        "Only available audio slots are shown",
+        "Falls back to legacy audioUrl if no binary is stored",
+        "Shows 'No audio available' UI if neither binary nor legacy URL is available"
+      ]
+    },
+    {
+      "id": "REQ-59",
+      "text": "Implement optimistic UI updates for chapter save operations in the admin panel. When the admin submits the ChapterForm to create or update a chapter, immediately update the TanStack Query cache with the new/edited chapter data on the frontend before the canister write completes. If the canister write fails, revert the cache to the previous state and display an error message. This eliminates the perceived save delay so the chapter list appears to update instantly.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Faster saves — optimistic UI updates so the chapter list reflects changes instantly on the frontend while the canister write happens in the background, removing the perceived wait time.",
+          "make the saving speed fast in an instent"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After clicking Save in ChapterForm, the chapter list in AdminPage updates immediately without waiting for the canister response",
+        "If the canister write fails, the chapter list reverts to its pre-save state",
+        "An error message is displayed if the canister write fails",
+        "Successful saves are confirmed once the canister responds and the cache is officially invalidated/re-fetched"
+      ]
+    },
+    {
+      "id": "REQ-60",
+      "text": "Perform a full color contrast audit and fix across all frontend components and pages in both light and dark mode. Every text element must have sufficient contrast against its background. Specifically fix: button labels on gradient/colored backgrounds, card text on colored card backgrounds, tab labels (active and inactive) in both modes, form input labels and placeholder text, flashcard front/back text, quiz option text and selected-state text, chapter list item text, admin panel form fields and section headers, recently viewed section text, empty-state messages, progress indicators, and any other element where text color matches or is too close to the background color. Use Tailwind's dark: variant classes and ensure all fixes apply correctly when the 'dark' class is present on the document root.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "plz do adjest the color corection because in some the text and backgound colormix and text or options become invinsible in both light and dark mode",
+          "Color contrast fixes — full audit and fix of all text/background color combinations across light and dark mode"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All text across every page and component is clearly visible against its background in light mode",
+        "All text across every page and component is clearly visible against its background in dark mode",
+        "No button, card, tab, form, quiz option, or flashcard face has text that blends into or disappears against its background color",
+        "Tailwind dark: variant classes are used for all dark mode color overrides",
+        "Fixes apply to Header, Footer, HomePage, ClassPage, SubjectPage, MDCATPage, MDCATSubjectPage, ChapterPage (all tabs), AdminPage, ChapterForm, FlashcardSection, QuizSection, AudioPlayer, NotesViewer, SplashScreen, SupportPage, and TermsPage"
       ]
     }
   ],
   "constraints": [
-    "Do not add any visible label such as 'Admin' near the hidden link.",
-    "Do not alter any other content or layout on TermsPage.",
-    "Do not add any authentication or password prompt on the /admin route."
+    "Do not remove or modify existing notesUrl, audioUrl, audioMimeType, uploadAudioChunk, finalizeAudioUpload, getAudioData, or deleteAudioData fields and functions — new fields are additive only",
+    "All new audio binary storage must use stable variables in Motoko",
+    "Edit and Delete buttons must remain hidden from all student-facing pages (SubjectPage, MDCATSubjectPage) and visible only in AdminPage",
+    "Admin panel at /admin must remain fully open-access with no password prompt",
+    "Hidden 'Sia' admin entry point in TermsPage must remain unchanged",
+    "frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and frontend/src/components/ui/* must not be modified",
+    "User-specific data (recently viewed, completed status) must remain device-local in LocalStorage and must not be synced to the canister"
   ],
   "nonGoals": [
-    "Changing the admin panel UI or functionality.",
-    "Adding any new Terms & Conditions content.",
-    "Modifying the backend canister."
+    "Adding more than two notes links or two audio files per chapter",
+    "Changing the quiz or flashcard manual entry UI in ChapterForm",
+    "Adding authentication or password protection to the admin panel",
+    "Migrating recently viewed or completed progress data to the canister",
+    "Changing the PWA manifest, service worker, or offline caching behavior",
+    "Modifying the MDCAT PDF entry structure or its admin UI",
+    "Changing the splash screen, support page, or terms page content (except existing 'Sia' hidden link)"
   ],
   "imageRequirements": {
     "required": [],

@@ -19,7 +19,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
         <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
           <HelpCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
         </div>
-        <h3 className="text-lg font-heading font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
           No Quiz Available
         </h3>
         <p className="text-gray-500 dark:text-gray-400">
@@ -31,6 +31,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
 
   const currentQuestion = questions[currentIndex];
   const isAnswered = selectedAnswer !== null;
+  // correctAnswer is a number (index into options array)
   const score = answers.filter((a, i) => a === questions[i]?.correctAnswer).length;
 
   const handleAnswer = (idx: number) => {
@@ -64,13 +65,13 @@ export default function QuizSection({ questions }: QuizSectionProps) {
         <div className="w-24 h-24 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-6">
           <Trophy className="w-12 h-12 text-yellow-500 dark:text-yellow-400" />
         </div>
-        <h2 className="font-heading font-bold text-2xl text-gray-900 dark:text-white mb-2">
+        <h2 className="font-bold text-2xl text-gray-900 dark:text-white mb-2">
           Quiz Complete!
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mb-6">Here's how you did</p>
 
         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 mb-6">
-          <div className="text-5xl font-heading font-bold text-primary dark:text-blue-400 mb-2">
+          <div className="text-5xl font-bold text-primary dark:text-blue-400 mb-2">
             {percentage}%
           </div>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
@@ -85,15 +86,14 @@ export default function QuizSection({ questions }: QuizSectionProps) {
         </div>
 
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          {percentage >= 80 ? '🎉 Excellent work! Keep it up!' :
-           percentage >= 60 ? '👍 Good job! Review the missed questions.' :
-           '📚 Keep studying! You can do better next time.'}
+          {percentage >= 80
+            ? '🎉 Excellent work! Keep it up!'
+            : percentage >= 60
+            ? '👍 Good job! Review the missed questions.'
+            : '📚 Keep studying! You can do better next time.'}
         </p>
 
-        <Button
-          onClick={handleRestart}
-          className="bg-primary dark:bg-blue-600 hover:bg-primary/90 dark:hover:bg-blue-700 text-white gap-2 px-8"
-        >
+        <Button onClick={handleRestart} className="gap-2 px-8">
           <RotateCcw className="w-4 h-4" />
           Try Again
         </Button>
@@ -119,7 +119,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
 
       {/* Question */}
       <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-        <p className="font-heading font-semibold text-lg text-gray-900 dark:text-white leading-relaxed">
+        <p className="font-semibold text-lg text-gray-900 dark:text-white leading-relaxed">
           {currentQuestion.question}
         </p>
       </div>
@@ -127,16 +127,19 @@ export default function QuizSection({ questions }: QuizSectionProps) {
       {/* Options */}
       <div className="flex flex-col gap-3">
         {currentQuestion.options.map((option, idx) => {
+          const isCorrect = idx === currentQuestion.correctAnswer;
+          const isSelected = idx === selectedAnswer;
+
           let optionClass =
             'w-full text-left px-5 py-4 rounded-xl border-2 font-medium transition-all duration-200 flex items-center gap-3 ';
 
           if (!isAnswered) {
             optionClass +=
               'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:border-primary dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer';
-          } else if (idx === currentQuestion.correctAnswer) {
+          } else if (isCorrect) {
             optionClass +=
               'border-green-500 dark:border-green-500 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-          } else if (idx === selectedAnswer && idx !== currentQuestion.correctAnswer) {
+          } else if (isSelected && !isCorrect) {
             optionClass +=
               'border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200';
           } else {
@@ -155,10 +158,10 @@ export default function QuizSection({ questions }: QuizSectionProps) {
                 {String.fromCharCode(65 + idx)}
               </span>
               <span className="flex-1">{option}</span>
-              {isAnswered && idx === currentQuestion.correctAnswer && (
+              {isAnswered && isCorrect && (
                 <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0" />
               )}
-              {isAnswered && idx === selectedAnswer && idx !== currentQuestion.correctAnswer && (
+              {isAnswered && isSelected && !isCorrect && (
                 <XCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
               )}
             </button>
@@ -169,10 +172,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
       {/* Next button */}
       {isAnswered && (
         <div className="flex justify-end">
-          <Button
-            onClick={handleNext}
-            className="bg-primary dark:bg-blue-600 hover:bg-primary/90 dark:hover:bg-blue-700 text-white"
-          >
+          <Button onClick={handleNext}>
             {currentIndex + 1 >= questions.length ? 'See Results' : 'Next Question'}
           </Button>
         </div>

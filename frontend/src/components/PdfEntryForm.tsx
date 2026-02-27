@@ -15,7 +15,7 @@ interface PdfEntryFormProps {
 
 export default function PdfEntryForm({ entry, onSave, onCancel }: PdfEntryFormProps) {
   const [title, setTitle] = useState(entry?.title ?? '');
-  const [entryType, setEntryType] = useState<'past-paper' | 'practice-test'>(
+  const [entryType, setEntryType] = useState<string>(
     entry?.entryType ?? 'past-paper'
   );
   const [url, setUrl] = useState(entry?.url ?? '');
@@ -38,7 +38,7 @@ export default function PdfEntryForm({ entry, onSave, onCancel }: PdfEntryFormPr
 
     try {
       if (isEditing && entry) {
-        await updatePdfMutation.mutateAsync({ id: BigInt(entry.id), input });
+        await updatePdfMutation.mutateAsync({ id: entry.id, input });
       } else {
         await addPdfMutation.mutateAsync(input);
       }
@@ -77,7 +77,7 @@ export default function PdfEntryForm({ entry, onSave, onCancel }: PdfEntryFormPr
 
           <div className="space-y-2">
             <Label>Type</Label>
-            <Select value={entryType} onValueChange={(v) => setEntryType(v as 'past-paper' | 'practice-test')}>
+            <Select value={entryType} onValueChange={(v) => setEntryType(v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

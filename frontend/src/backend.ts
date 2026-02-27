@@ -89,10 +89,30 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface ChapterInput {
+export interface PdfEntryInput {
+    url: string;
     title: string;
+    entryType: string;
+}
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
+}
+export interface ChapterSnapshot {
+    id: bigint;
+    title: string;
+    notesLabel1: string;
+    notesLabel2: string;
+    audioLabel1: string;
+    audioLabel2: string;
     classNumber: string;
+    notesUrl1: string;
+    notesUrl2: string;
     subject: string;
+    audioMimeType2: string;
+    createdAt: bigint;
+    audioBlob2?: ExternalBlob;
+    audioMimeType: string;
+    audioBlob?: ExternalBlob;
     audioUrl: string;
     notesUrl: string;
     quizQuestions: string;
@@ -104,36 +124,143 @@ export interface PdfEntry {
     title: string;
     entryType: string;
 }
-export interface Chapter {
-    id: bigint;
+export interface _CaffeineStorageCreateCertificateResult {
+    method: string;
+    blob_hash: string;
+}
+export interface ChapterInput {
     title: string;
+    notesLabel1: string;
+    notesLabel2: string;
+    audioLabel1: string;
+    audioLabel2: string;
     classNumber: string;
+    notesUrl1: string;
+    notesUrl2: string;
     subject: string;
-    createdAt: bigint;
+    audioMimeType2: string;
+    audioMimeType: string;
     audioUrl: string;
     notesUrl: string;
     quizQuestions: string;
     flashcards: string;
 }
-export interface PdfEntryInput {
-    url: string;
-    title: string;
-    entryType: string;
+export interface _CaffeineStorageRefillResult {
+    success?: boolean;
+    topped_up_amount?: bigint;
 }
 export interface backendInterface {
+    _caffeineStorageBlobIsLive(hash: Uint8Array): Promise<boolean>;
+    _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>>;
+    _caffeineStorageConfirmBlobDeletion(blobs: Array<Uint8Array>): Promise<void>;
+    _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
+    _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
+    _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     addChapter(input: ChapterInput): Promise<bigint>;
     addPdfEntry(input: PdfEntryInput): Promise<bigint>;
+    deleteAudioData(chapterId: bigint): Promise<boolean>;
+    deleteAudioData2(chapterId: bigint): Promise<boolean>;
     deleteChapter(id: bigint): Promise<boolean>;
     deletePdfEntry(id: bigint): Promise<boolean>;
-    getAllChapters(): Promise<Array<Chapter>>;
+    finalizeAudioUpload(chapterId: bigint, totalChunks: bigint): Promise<boolean>;
+    finalizeAudioUpload2(chapterId: bigint, totalChunks: bigint): Promise<boolean>;
+    getAllChapters(): Promise<Array<ChapterSnapshot>>;
     getAllPdfEntries(): Promise<Array<PdfEntry>>;
-    getChapter(id: bigint): Promise<Chapter | null>;
+    getAudioData(chapterId: bigint): Promise<Uint8Array | null>;
+    getAudioData2(chapterId: bigint): Promise<Uint8Array | null>;
+    getChapter(id: bigint): Promise<ChapterSnapshot | null>;
     updateChapter(id: bigint, input: ChapterInput): Promise<boolean>;
     updatePdfEntry(id: bigint, input: PdfEntryInput): Promise<boolean>;
+    uploadAudioChunk(chapterId: bigint, chunkIndex: bigint, totalChunks: bigint, data: Uint8Array): Promise<boolean>;
+    uploadAudioChunk2(chapterId: bigint, chunkIndex: bigint, totalChunks: bigint, data: Uint8Array): Promise<boolean>;
 }
-import type { Chapter as _Chapter } from "./declarations/backend.did.d.ts";
+import type { ChapterSnapshot as _ChapterSnapshot, ExternalBlob as _ExternalBlob, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobsToDelete();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobsToDelete();
+            return result;
+        }
+    }
+    async _caffeineStorageConfirmBlobDeletion(arg0: Array<Uint8Array>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageCreateCertificate(arg0: string): Promise<_CaffeineStorageCreateCertificateResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageRefillCashier(arg0: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+                return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+            return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async _caffeineStorageUpdateGatewayPrincipals(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+            return result;
+        }
+    }
     async addChapter(arg0: ChapterInput): Promise<bigint> {
         if (this.processError) {
             try {
@@ -159,6 +286,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addPdfEntry(arg0);
+            return result;
+        }
+    }
+    async deleteAudioData(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteAudioData(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteAudioData(arg0);
+            return result;
+        }
+    }
+    async deleteAudioData2(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteAudioData2(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteAudioData2(arg0);
             return result;
         }
     }
@@ -190,18 +345,46 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getAllChapters(): Promise<Array<Chapter>> {
+    async finalizeAudioUpload(arg0: bigint, arg1: bigint): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllChapters();
+                const result = await this.actor.finalizeAudioUpload(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllChapters();
+            const result = await this.actor.finalizeAudioUpload(arg0, arg1);
             return result;
+        }
+    }
+    async finalizeAudioUpload2(arg0: bigint, arg1: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.finalizeAudioUpload2(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.finalizeAudioUpload2(arg0, arg1);
+            return result;
+        }
+    }
+    async getAllChapters(): Promise<Array<ChapterSnapshot>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllChapters();
+                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllChapters();
+            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllPdfEntries(): Promise<Array<PdfEntry>> {
@@ -218,18 +401,46 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getChapter(arg0: bigint): Promise<Chapter | null> {
+    async getAudioData(arg0: bigint): Promise<Uint8Array | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAudioData(arg0);
+                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAudioData(arg0);
+            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAudioData2(arg0: bigint): Promise<Uint8Array | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAudioData2(arg0);
+                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAudioData2(arg0);
+            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getChapter(arg0: bigint): Promise<ChapterSnapshot | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getChapter(arg0);
-                return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getChapter(arg0);
-            return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
         }
     }
     async updateChapter(arg0: bigint, arg1: ChapterInput): Promise<boolean> {
@@ -260,9 +471,151 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async uploadAudioChunk(arg0: bigint, arg1: bigint, arg2: bigint, arg3: Uint8Array): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.uploadAudioChunk(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.uploadAudioChunk(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async uploadAudioChunk2(arg0: bigint, arg1: bigint, arg2: bigint, arg3: Uint8Array): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.uploadAudioChunk2(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.uploadAudioChunk2(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
 }
-function from_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Chapter]): Chapter | null {
+async function from_candid_ChapterSnapshot_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ChapterSnapshot): Promise<ChapterSnapshot> {
+    return await from_candid_record_n10(_uploadFile, _downloadFile, value);
+}
+async function from_candid_ExternalBlob_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+    return await _downloadFile(value);
+}
+function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+async function from_candid_opt_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ExternalBlob]): Promise<ExternalBlob | null> {
+    return value.length === 0 ? null : await from_candid_ExternalBlob_n12(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Uint8Array]): Uint8Array | null {
     return value.length === 0 ? null : value[0];
+}
+async function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ChapterSnapshot]): Promise<ChapterSnapshot | null> {
+    return value.length === 0 ? null : await from_candid_ChapterSnapshot_n9(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+async function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    title: string;
+    notesLabel1: string;
+    notesLabel2: string;
+    audioLabel1: string;
+    audioLabel2: string;
+    classNumber: string;
+    notesUrl1: string;
+    notesUrl2: string;
+    subject: string;
+    audioMimeType2: string;
+    createdAt: bigint;
+    audioBlob2: [] | [_ExternalBlob];
+    audioMimeType: string;
+    audioBlob: [] | [_ExternalBlob];
+    audioUrl: string;
+    notesUrl: string;
+    quizQuestions: string;
+    flashcards: string;
+}): Promise<{
+    id: bigint;
+    title: string;
+    notesLabel1: string;
+    notesLabel2: string;
+    audioLabel1: string;
+    audioLabel2: string;
+    classNumber: string;
+    notesUrl1: string;
+    notesUrl2: string;
+    subject: string;
+    audioMimeType2: string;
+    createdAt: bigint;
+    audioBlob2?: ExternalBlob;
+    audioMimeType: string;
+    audioBlob?: ExternalBlob;
+    audioUrl: string;
+    notesUrl: string;
+    quizQuestions: string;
+    flashcards: string;
+}> {
+    return {
+        id: value.id,
+        title: value.title,
+        notesLabel1: value.notesLabel1,
+        notesLabel2: value.notesLabel2,
+        audioLabel1: value.audioLabel1,
+        audioLabel2: value.audioLabel2,
+        classNumber: value.classNumber,
+        notesUrl1: value.notesUrl1,
+        notesUrl2: value.notesUrl2,
+        subject: value.subject,
+        audioMimeType2: value.audioMimeType2,
+        createdAt: value.createdAt,
+        audioBlob2: record_opt_to_undefined(await from_candid_opt_n11(_uploadFile, _downloadFile, value.audioBlob2)),
+        audioMimeType: value.audioMimeType,
+        audioBlob: record_opt_to_undefined(await from_candid_opt_n11(_uploadFile, _downloadFile, value.audioBlob)),
+        audioUrl: value.audioUrl,
+        notesUrl: value.notesUrl,
+        quizQuestions: value.quizQuestions,
+        flashcards: value.flashcards
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    success: [] | [boolean];
+    topped_up_amount: [] | [bigint];
+}): {
+    success?: boolean;
+    topped_up_amount?: bigint;
+} {
+    return {
+        success: record_opt_to_undefined(from_candid_opt_n6(_uploadFile, _downloadFile, value.success)),
+        topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
+    };
+}
+async function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ChapterSnapshot>): Promise<Array<ChapterSnapshot>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_ChapterSnapshot_n9(_uploadFile, _downloadFile, x)));
+}
+function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
+    return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
+}
+function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    proposed_top_up_amount?: bigint;
+}): {
+    proposed_top_up_amount: [] | [bigint];
+} {
+    return {
+        proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
+    };
 }
 export interface CreateActorOptions {
     agent?: Agent;

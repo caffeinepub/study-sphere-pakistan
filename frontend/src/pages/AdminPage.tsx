@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
-  Plus, Pencil, Trash2, BookOpen, FileText, Loader2, AlertCircle, ChevronLeft,
+  Plus, Pencil, Trash2, BookOpen, FileText, Loader2, AlertCircle, ChevronLeft, ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,65 +24,86 @@ import {
   useGetAllPdfEntries,
   useDeletePdfEntry,
 } from '../hooks/useQueries';
-import { mapBackendChapter, mapBackendPdfEntry } from '../utils/chapterMapper';
 import type { Chapter, PdfEntry } from '../types/chapter';
 import ChapterForm from '../components/ChapterForm';
 import PdfEntryForm from '../components/PdfEntryForm';
 
+type AdminView = 'list' | 'addChapter' | 'editChapter' | 'addPdf' | 'editPdf';
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('chapters');
-  const [showChapterForm, setShowChapterForm] = useState(false);
+  const [view, setView] = useState<AdminView>('list');
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
-  const [showPdfForm, setShowPdfForm] = useState(false);
   const [editingPdf, setEditingPdf] = useState<PdfEntry | null>(null);
 
-  const { data: backendChapters, isLoading: chaptersLoading, isError: chaptersError } = useGetAllChapters();
-  const { data: backendPdfs, isLoading: pdfsLoading, isError: pdfsError } = useGetAllPdfEntries();
+  const { data: chapters, isLoading: chaptersLoading, isError: chaptersError } = useGetAllChapters();
+  const { data: pdfEntries, isLoading: pdfsLoading, isError: pdfsError } = useGetAllPdfEntries();
   const deleteChapterMutation = useDeleteChapter();
   const deletePdfMutation = useDeletePdfEntry();
 
-  const chapters: Chapter[] = (backendChapters ?? []).map(mapBackendChapter);
-  const pdfEntries: PdfEntry[] = (backendPdfs ?? []).map(mapBackendPdfEntry);
+  const chapterList = chapters ?? [];
+  const pdfList = pdfEntries ?? [];
 
   const handleDeleteChapter = async (id: string) => {
-    await deleteChapterMutation.mutateAsync(BigInt(id));
+    await deleteChapterMutation.mutateAsync(id);
   };
 
   const handleDeletePdf = async (id: string) => {
-    await deletePdfMutation.mutateAsync(BigInt(id));
+    await deletePdfMutation.mutateAsync(id);
   };
 
   const handleChapterSaved = () => {
-    setShowChapterForm(false);
+    setView('list');
     setEditingChapter(null);
   };
 
   const handlePdfSaved = () => {
-    setShowPdfForm(false);
+    setView('list');
     setEditingPdf(null);
   };
 
-  if (showChapterForm || editingChapter) {
+  // ── Chapter Form view ──────────────────────────────────────────────────────
+  if (view === 'addChapter' || view === 'editChapter') {
     return (
-      <ChapterForm
-        chapter={editingChapter ?? undefined}
-        onSave={handleChapterSaved}
-        onCancel={() => { setShowChapterForm(false); setEditingChapter(null); }}
-      />
+      <div className="min-h-screen bg-background">
+        <header className="bg-card border-b border-border sticky top-0 z-10">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => { setView('list'); setEditingChapter(null); }}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-xl font-bold text-foreground">
+              {view === 'editChapter' ? 'Edit Chapter' : 'Add Chapter'}
+            </h1>
+          </div>
+        </header>
+        <main className="max-w-3xl mx-auto px-4 py-6">
+          <ChapterForm
+            chapter={editingChapter ?? undefined}
+            onSuccess={handleChapterSaved}
+            onCancel={() => { setView('list'); setEditingChapter(null); }}
+          />
+        </main>
+      </div>
     );
   }
 
-  if (showPdfForm || editingPdf) {
+  // ── PDF Form view ──────────────────────────────────────────────────────────
+  if (view === 'addPdf' || view === 'editPdf') {
     return (
       <PdfEntryForm
         entry={editingPdf ?? undefined}
         onSave={handlePdfSaved}
-        onCancel={() => { setShowPdfForm(false); setEditingPdf(null); }}
+        onCancel={() => { setView('list'); setEditingPdf(null); }}
       />
     );
   }
 
+  // ── Main list view ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -104,15 +125,15 @@ export default function AdminPage() {
             <TabsTrigger value="chapters" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Chapters
-              {chapters.length > 0 && (
-                <Badge variant="secondary" className="ml-1">{chapters.length}</Badge>
+              {chapterList.length > 0 && (
+                <Badge variant="secondary" className="ml-1">{chapterList.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="pdfs" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               PDF Entries
-              {pdfEntries.length > 0 && (
-                <Badge variant="secondary" className="ml-1">{pdfEntries.length}</Badge>
+              {pdfList.length > 0 && (
+                <Badge variant="secondary" className="ml-1">{pdfList.length}</Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -121,7 +142,10 @@ export default function AdminPage() {
           <TabsContent value="chapters">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-foreground">All Chapters</h2>
-              <Button onClick={() => setShowChapterForm(true)} className="flex items-center gap-2">
+              <Button
+                onClick={() => { setEditingChapter(null); setView('addChapter'); }}
+                className="flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" />
                 Add Chapter
               </Button>
@@ -142,16 +166,16 @@ export default function AdminPage() {
               </div>
             )}
 
-            {!chaptersLoading && !chaptersError && chapters.length === 0 && (
+            {!chaptersLoading && !chaptersError && chapterList.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p>No chapters yet. Add your first chapter!</p>
               </div>
             )}
 
-            {!chaptersLoading && !chaptersError && chapters.length > 0 && (
+            {!chaptersLoading && !chaptersError && chapterList.length > 0 && (
               <div className="space-y-3">
-                {chapters.map(chapter => (
+                {chapterList.map((chapter) => (
                   <div
                     key={chapter.id}
                     className="flex items-center justify-between bg-card border border-border rounded-lg px-4 py-3 shadow-sm"
@@ -166,7 +190,7 @@ export default function AdminPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setEditingChapter(chapter)}
+                        onClick={() => { setEditingChapter(chapter); setView('editChapter'); }}
                         className="text-muted-foreground hover:text-foreground"
                       >
                         <Pencil className="w-4 h-4" />
@@ -214,7 +238,10 @@ export default function AdminPage() {
           <TabsContent value="pdfs">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-foreground">All PDF Entries</h2>
-              <Button onClick={() => setShowPdfForm(true)} className="flex items-center gap-2">
+              <Button
+                onClick={() => { setEditingPdf(null); setView('addPdf'); }}
+                className="flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" />
                 Add PDF Entry
               </Button>
@@ -235,16 +262,16 @@ export default function AdminPage() {
               </div>
             )}
 
-            {!pdfsLoading && !pdfsError && pdfEntries.length === 0 && (
+            {!pdfsLoading && !pdfsError && pdfList.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p>No PDF entries yet. Add your first entry!</p>
               </div>
             )}
 
-            {!pdfsLoading && !pdfsError && pdfEntries.length > 0 && (
+            {!pdfsLoading && !pdfsError && pdfList.length > 0 && (
               <div className="space-y-3">
-                {pdfEntries.map(entry => (
+                {pdfList.map((entry) => (
                   <div
                     key={entry.id}
                     className="flex items-center justify-between bg-card border border-border rounded-lg px-4 py-3 shadow-sm"
@@ -257,7 +284,7 @@ export default function AdminPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setEditingPdf(entry)}
+                        onClick={() => { setEditingPdf(entry); setView('editPdf'); }}
                         className="text-muted-foreground hover:text-foreground"
                       >
                         <Pencil className="w-4 h-4" />

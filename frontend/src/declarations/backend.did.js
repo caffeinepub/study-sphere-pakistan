@@ -8,10 +8,29 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const ChapterInput = IDL.Record({
   'title' : IDL.Text,
+  'notesLabel1' : IDL.Text,
+  'notesLabel2' : IDL.Text,
+  'audioLabel1' : IDL.Text,
+  'audioLabel2' : IDL.Text,
   'classNumber' : IDL.Text,
+  'notesUrl1' : IDL.Text,
+  'notesUrl2' : IDL.Text,
   'subject' : IDL.Text,
+  'audioMimeType2' : IDL.Text,
+  'audioMimeType' : IDL.Text,
   'audioUrl' : IDL.Text,
   'notesUrl' : IDL.Text,
   'quizQuestions' : IDL.Text,
@@ -22,12 +41,23 @@ export const PdfEntryInput = IDL.Record({
   'title' : IDL.Text,
   'entryType' : IDL.Text,
 });
-export const Chapter = IDL.Record({
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const ChapterSnapshot = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
+  'notesLabel1' : IDL.Text,
+  'notesLabel2' : IDL.Text,
+  'audioLabel1' : IDL.Text,
+  'audioLabel2' : IDL.Text,
   'classNumber' : IDL.Text,
+  'notesUrl1' : IDL.Text,
+  'notesUrl2' : IDL.Text,
   'subject' : IDL.Text,
+  'audioMimeType2' : IDL.Text,
   'createdAt' : IDL.Int,
+  'audioBlob2' : IDL.Opt(ExternalBlob),
+  'audioMimeType' : IDL.Text,
+  'audioBlob' : IDL.Opt(ExternalBlob),
   'audioUrl' : IDL.Text,
   'notesUrl' : IDL.Text,
   'quizQuestions' : IDL.Text,
@@ -41,24 +71,85 @@ export const PdfEntry = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   'addChapter' : IDL.Func([ChapterInput], [IDL.Nat], []),
   'addPdfEntry' : IDL.Func([PdfEntryInput], [IDL.Nat], []),
+  'deleteAudioData' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteAudioData2' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deleteChapter' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deletePdfEntry' : IDL.Func([IDL.Nat], [IDL.Bool], []),
-  'getAllChapters' : IDL.Func([], [IDL.Vec(Chapter)], ['query']),
+  'finalizeAudioUpload' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+  'finalizeAudioUpload2' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+  'getAllChapters' : IDL.Func([], [IDL.Vec(ChapterSnapshot)], ['query']),
   'getAllPdfEntries' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
-  'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
+  'getAudioData' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Vec(IDL.Nat8))], []),
+  'getAudioData2' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Vec(IDL.Nat8))], []),
+  'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(ChapterSnapshot)], ['query']),
   'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
   'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
+  'uploadAudioChunk' : IDL.Func(
+      [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      [],
+    ),
+  'uploadAudioChunk2' : IDL.Func(
+      [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const ChapterInput = IDL.Record({
     'title' : IDL.Text,
+    'notesLabel1' : IDL.Text,
+    'notesLabel2' : IDL.Text,
+    'audioLabel1' : IDL.Text,
+    'audioLabel2' : IDL.Text,
     'classNumber' : IDL.Text,
+    'notesUrl1' : IDL.Text,
+    'notesUrl2' : IDL.Text,
     'subject' : IDL.Text,
+    'audioMimeType2' : IDL.Text,
+    'audioMimeType' : IDL.Text,
     'audioUrl' : IDL.Text,
     'notesUrl' : IDL.Text,
     'quizQuestions' : IDL.Text,
@@ -69,12 +160,23 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'entryType' : IDL.Text,
   });
-  const Chapter = IDL.Record({
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const ChapterSnapshot = IDL.Record({
     'id' : IDL.Nat,
     'title' : IDL.Text,
+    'notesLabel1' : IDL.Text,
+    'notesLabel2' : IDL.Text,
+    'audioLabel1' : IDL.Text,
+    'audioLabel2' : IDL.Text,
     'classNumber' : IDL.Text,
+    'notesUrl1' : IDL.Text,
+    'notesUrl2' : IDL.Text,
     'subject' : IDL.Text,
+    'audioMimeType2' : IDL.Text,
     'createdAt' : IDL.Int,
+    'audioBlob2' : IDL.Opt(ExternalBlob),
+    'audioMimeType' : IDL.Text,
+    'audioBlob' : IDL.Opt(ExternalBlob),
     'audioUrl' : IDL.Text,
     'notesUrl' : IDL.Text,
     'quizQuestions' : IDL.Text,
@@ -88,15 +190,57 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     'addChapter' : IDL.Func([ChapterInput], [IDL.Nat], []),
     'addPdfEntry' : IDL.Func([PdfEntryInput], [IDL.Nat], []),
+    'deleteAudioData' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteAudioData2' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteChapter' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deletePdfEntry' : IDL.Func([IDL.Nat], [IDL.Bool], []),
-    'getAllChapters' : IDL.Func([], [IDL.Vec(Chapter)], ['query']),
+    'finalizeAudioUpload' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+    'finalizeAudioUpload2' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Bool], []),
+    'getAllChapters' : IDL.Func([], [IDL.Vec(ChapterSnapshot)], ['query']),
     'getAllPdfEntries' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
-    'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
+    'getAudioData' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Vec(IDL.Nat8))], []),
+    'getAudioData2' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Vec(IDL.Nat8))], []),
+    'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(ChapterSnapshot)], ['query']),
     'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
     'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
+    'uploadAudioChunk' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        [],
+      ),
+    'uploadAudioChunk2' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Nat, IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        [],
+      ),
   });
 };
 

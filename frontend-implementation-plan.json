@@ -1,24 +1,237 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update TermsPage hidden admin link to word 'Sia'",
+  "title": "Dual notes/audio with labels, optimistic UI, and full color contrast fixes",
   "requirements": [
     {
-      "id": "REQ-46",
-      "summary": "Update the hidden admin entry point in TermsPage.tsx so that the word 'Sia' appears as the very last word of the last condition, styled to blend naturally into the surrounding text, and clicking it navigates to /admin",
+      "id": "REQ-54",
+      "summary": "Extend frontend Chapter type to support dual notes and audio with labels",
       "acceptanceCriteria": [
-        "The word 'Sia' is rendered as the last word of the last condition on the Terms & Conditions page.",
-        "The word 'Sia' is styled to visually blend into the surrounding paragraph text — matching font size, color, and weight — with no underline or other distinguishing decoration in its default state.",
-        "Clicking 'Sia' navigates the user directly to /admin without any password prompt or intermediate screen.",
-        "No other text content on the Terms & Conditions page is added, removed, or altered.",
-        "The entry point does not appear in the site header, footer, or any navigation menu.",
-        "The hidden link works correctly in both light mode and dark mode."
+        "Chapter interface includes notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 as optional string fields",
+        "chapterMapper.ts correctly maps these new fields from canister response to frontend type without breaking existing fields"
       ],
       "file_operations": [
         {
+          "path": "frontend/src/types/chapter.ts",
+          "operation": "modify",
+          "description": "Add optional fields to Chapter interface: notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 (all optional strings). These fields support dual notes links and dual audio files with custom admin labels."
+        },
+        {
+          "path": "frontend/src/utils/chapterMapper.ts",
+          "operation": "modify",
+          "description": "Update mapChapter function to map the seven new backend fields (notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2) from ChapterSnapshot to the frontend Chapter type, ensuring empty strings or undefined values are handled correctly and existing field mappings remain unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-55",
+      "summary": "Add chunked upload utility for second audio slot",
+      "acceptanceCriteria": [
+        "uploadAudioFile2 function exists in audioUploadService.ts",
+        "It splits the file into chunks of at most 1.5MB",
+        "It calls uploadAudioChunk2 sequentially for each chunk",
+        "It calls finalizeAudioUpload2 after all chunks are sent",
+        "Progress callback fires with percentage 0–100 during upload",
+        "Returns a resolved promise on success and a rejected promise with error message on failure"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/audioUploadService.ts",
+          "operation": "modify",
+          "description": "Add uploadAudioFile2 function that mirrors the existing uploadAudioFile implementation but calls uploadAudioChunk2 and finalizeAudioUpload2 backend methods for the second audio slot. Split File into 1.5MB chunks, upload sequentially, invoke progress callback (0–100%), and return a promise that resolves on successful finalization or rejects with an error message."
+        }
+      ]
+    },
+    {
+      "id": "REQ-56",
+      "summary": "Expand ChapterForm to support dual notes URLs and dual audio uploads with labels",
+      "acceptanceCriteria": [
+        "ChapterForm shows two notes URL text inputs, each with an optional label text field",
+        "ChapterForm shows two audio file upload inputs (accept audio/*), each with an optional label text field",
+        "Each audio upload shows its own progress bar, success message, and error message",
+        "When editing, chapters with existing audio for slot 1 show 'Audio file uploaded' for slot 1; same for slot 2",
+        "On save, audio uploads are performed sequentially after chapter create/update",
+        "All notes URL and audio fields are optional — chapter with only title saves successfully",
+        "notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2 values are passed to createChapter/updateChapter"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ChapterForm.tsx",
+          "operation": "modify",
+          "description": "Replace single notes URL input with two: notesUrl1 + notesLabel1 (placeholder: 'Notes 1 Label') and notesUrl2 + notesLabel2 (placeholder: 'Notes 2 Label'). Replace single audio upload with two: audio1 file input + audioLabel1 (placeholder: 'Audio 1 Label') and audio2 file input + audioLabel2 (placeholder: 'Audio 2 Label'). Add state for both audio files, labels, progress (0–100%), and success/error messages. Show 'Audio file uploaded' status when editing a chapter with existing audioBlob or audioBlob2. On save: create/update chapter with all six new text fields, then sequentially upload audio1 (via uploadAudioFile) and audio2 (via uploadAudioFile2) if files are selected. Display individual progress bars and status messages for each upload. All fields remain optional."
+        }
+      ]
+    },
+    {
+      "id": "REQ-57",
+      "summary": "Update Notes tab to show named buttons for dual notes links",
+      "acceptanceCriteria": [
+        "Notes tab shows a named button for notesUrl1 using notesLabel1 (fallback: 'Notes 1') when notesUrl1 is present",
+        "Notes tab shows a named button for notesUrl2 using notesLabel2 (fallback: 'Notes 2') when notesUrl2 is present",
+        "Clicking a named button opens/embeds that specific notes URL",
+        "Only available (non-empty) notes links are shown",
+        "If no notes URLs are present, the existing empty-state UI is displayed"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ChapterPage.tsx",
+          "operation": "modify",
+          "description": "In the Notes tab, when chapter has notesUrl1 or notesUrl2, display named buttons (using notesLabel1 or 'Notes 1' / notesLabel2 or 'Notes 2' as labels). Track which notes URL is currently selected. Only render buttons for non-empty URLs. If neither URL is present, show the existing empty-state UI. Pass the selected URL to NotesViewer."
+        },
+        {
+          "path": "frontend/src/components/NotesViewer.tsx",
+          "operation": "modify",
+          "description": "Ensure NotesViewer accepts a notesUrl prop and embeds/displays it in the iframe. No structural changes needed if it already handles arbitrary URLs; verify it works with either notesUrl1 or notesUrl2 passed from ChapterPage."
+        }
+      ]
+    },
+    {
+      "id": "REQ-58",
+      "summary": "Update Audio tab to show named buttons for dual audio slots with binary fetching",
+      "acceptanceCriteria": [
+        "Audio tab shows a named button for audio slot 1 using audioLabel1 (fallback: 'Audio 1') when audio data exists for slot 1",
+        "Audio tab shows a named button for audio slot 2 using audioLabel2 (fallback: 'Audio 2') when audio data exists for slot 2",
+        "Clicking a named button fetches that slot's binary audio and plays it via AudioPlayer using an object URL",
+        "Object URLs are revoked on component unmount",
+        "Only available audio slots are shown",
+        "Falls back to legacy audioUrl if no binary is stored",
+        "Shows 'No audio available' UI if neither binary nor legacy URL is available"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ChapterPage.tsx",
+          "operation": "modify",
+          "description": "In the Audio tab, when chapter.audioBlob or chapter.audioBlob2 exist, display named buttons (using audioLabel1 or 'Audio 1' / audioLabel2 or 'Audio 2'). Track which slot is currently selected. On button click, fetch the binary via getAudioData (slot 1) or getAudioData2 (slot 2), convert to object URL using URL.createObjectURL, and pass to AudioPlayer. Revoke object URLs on unmount. If neither binary is available but legacy audioUrl exists, fall back to it. If no audio is available at all, show 'No audio available' UI."
+        },
+        {
+          "path": "frontend/src/components/AudioPlayer.tsx",
+          "operation": "modify",
+          "description": "Ensure AudioPlayer accepts an audioUrl prop (either object URL or external string) and handles it correctly. No structural changes needed if it already supports arbitrary URLs; verify it works with both object URLs and legacy audioUrl strings."
+        }
+      ]
+    },
+    {
+      "id": "REQ-59",
+      "summary": "Implement optimistic UI updates for chapter save operations",
+      "acceptanceCriteria": [
+        "After clicking Save in ChapterForm, the chapter list in AdminPage updates immediately without waiting for the canister response",
+        "If the canister write fails, the chapter list reverts to its pre-save state",
+        "An error message is displayed if the canister write fails",
+        "Successful saves are confirmed once the canister responds and the cache is officially invalidated/re-fetched"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update useCreateChapter and useUpdateChapter mutations to implement optimistic updates using TanStack Query's onMutate, onError, and onSettled callbacks. In onMutate: snapshot the current 'chapters' query cache, then optimistically update the cache with the new/edited chapter data. In onError: revert the cache to the snapshot and display an error message. In onSettled: invalidate the 'chapters' query to re-fetch authoritative data from the canister. This makes the chapter list appear to update instantly on save."
+        }
+      ]
+    },
+    {
+      "id": "REQ-60",
+      "summary": "Full color contrast audit and fixes across all components in light and dark mode",
+      "acceptanceCriteria": [
+        "All text across every page and component is clearly visible against its background in light mode",
+        "All text across every page and component is clearly visible against its background in dark mode",
+        "No button, card, tab, form, quiz option, or flashcard face has text that blends into or disappears against its background color",
+        "Tailwind dark: variant classes are used for all dark mode color overrides",
+        "Fixes apply to Header, Footer, HomePage, ClassPage, SubjectPage, MDCATPage, MDCATSubjectPage, ChapterPage (all tabs), AdminPage, ChapterForm, FlashcardSection, QuizSection, AudioPlayer, NotesViewer, SplashScreen, SupportPage, and TermsPage"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for navigation links, mobile menu items, and the dark mode toggle button in both light and dark mode. Ensure all text is clearly visible against the header background using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for brand text, quick links, legal links, and copyright text in both light and dark mode. Ensure all text is clearly visible against the footer background using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for the hero section heading, search bar placeholder, navigation buttons, and feature cards in both light and dark mode. Ensure all text on gradient or colored backgrounds is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/ClassPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, subject cards (title, description), and any hover states in both light and dark mode. Ensure card text is clearly visible against card backgrounds using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/SubjectPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, search input placeholder, recently viewed section heading, chapter card text, and empty-state messages in both light and dark mode. Ensure all text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/MDCATPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, subject cards, PDF entry cards, and any empty-state messages in both light and dark mode. Ensure all text is clearly visible against colored backgrounds using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/MDCATSubjectPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, search input placeholder, recently viewed section heading, chapter cards, and empty-state messages in both light and dark mode. Ensure all text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/ChapterPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page title, tab labels (Notes, Audio, Quiz, Flashcards) in both active and inactive states, empty-state messages, and any status text in both light and dark mode. Ensure tab text is clearly visible against tab backgrounds using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/AdminPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, tab labels (Chapters, PDF Entries), section headers, form labels, button text, chapter/PDF list item text, and empty-state messages in both light and dark mode. Ensure all admin UI text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/ChapterForm.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for form section headers, input labels, placeholder text, button labels (Save, Cancel), and any status/error messages in both light and dark mode. Ensure all form text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/FlashcardSection.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for flashcard front/back text, navigation button labels (Previous, Next), card counter text, and empty-state messages in both light and dark mode. Ensure flashcard text is clearly visible against card backgrounds (which may have custom colors) using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/QuizSection.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for question text, option text (both unselected and selected states), feedback text (correct/incorrect), score display, retry button label, and empty-state messages in both light and dark mode. Ensure quiz option text does not blend into colored backgrounds using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/AudioPlayer.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for control button labels, time display, error messages, and any fallback link text in both light and dark mode. Ensure all player UI text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/NotesViewer.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for empty-state messages, error messages, and 'Open in New Tab' fallback link text in both light and dark mode. Ensure all viewer UI text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/SplashScreen.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for the splash screen brand text and any tagline/subtitle in both light and dark mode. Ensure splash text is clearly visible against the splash background using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/pages/SupportPage.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for page heading, account number display, copy button label, instruction list text, and any additional info text in both light and dark mode. Ensure all support page text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
           "path": "frontend/src/pages/TermsPage.tsx",
           "operation": "modify",
-          "description": "Modify the last paragraph of the last condition to end with the word 'Sia' as a clickable link. Style the link element to match the surrounding body text (inheriting font-size, color, and font-weight from the paragraph) with no text-decoration in its default state. Use TanStack Router's Link component to navigate to /admin on click. Ensure the word 'Sia' appears naturally as the final word of the existing content without altering any other text on the page. The link must blend visually in both light and dark mode by inheriting CSS custom properties from the parent text."
+          "description": "Audit and fix text color contrast for page heading, section headings, body text, list items, and the hidden 'Sia' link in both light and dark mode. Ensure all terms text is clearly visible using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/ChapterCard.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for chapter title, available features text (notes, audio, quiz, flashcards icons/labels), and completion status badge text in both light and dark mode. Ensure card text is clearly visible against card backgrounds (which may have hover states or colored accents) using Tailwind dark: variant classes."
+        },
+        {
+          "path": "frontend/src/components/PdfEntryForm.tsx",
+          "operation": "modify",
+          "description": "Audit and fix text color contrast for form section headers, input labels, placeholder text, button labels (Save, Cancel), and any status/error messages in both light and dark mode. Ensure all form text is clearly visible using Tailwind dark: variant classes."
         }
       ]
     }

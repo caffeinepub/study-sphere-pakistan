@@ -1,23 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { Search, BookOpen, Loader2, AlertCircle } from 'lucide-react';
+import { Search, BookOpen, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useGetAllChapters, useDeleteChapter } from '../hooks/useQueries';
-import { mapBackendChapter } from '../utils/chapterMapper';
+import { useGetAllChapters } from '../hooks/useQueries';
 import { getRecentlyViewed, addRecentlyViewed } from '../utils/storageService';
 import type { Chapter } from '../types/chapter';
 
@@ -34,16 +22,13 @@ export default function SubjectPage() {
   const [search, setSearch] = useState('');
   const [recentIds, setRecentIds] = useState<string[]>([]);
 
-  const { data: backendChapters, isLoading, isError } = useGetAllChapters();
-  const deleteChapterMutation = useDeleteChapter();
+  const { data: chapters, isLoading, isError } = useGetAllChapters();
 
   useEffect(() => {
     setRecentIds(getRecentlyViewed());
   }, []);
 
-  const allChapters: Chapter[] = (backendChapters ?? []).map(mapBackendChapter);
-
-  const subjectChapters = allChapters.filter(
+  const subjectChapters = (chapters ?? []).filter(
     (ch) => ch.classNumber === classNum && ch.subject.toLowerCase() === subject.toLowerCase()
   );
 
@@ -59,10 +44,6 @@ export default function SubjectPage() {
     addRecentlyViewed(chapter.id);
     setRecentIds(getRecentlyViewed());
     navigate({ to: `/chapter/${chapter.id}` });
-  };
-
-  const handleDelete = async (id: string) => {
-    await deleteChapterMutation.mutateAsync(BigInt(id));
   };
 
   const subjectLabel = SUBJECT_LABELS[subject.toLowerCase()] ?? subject;
@@ -146,59 +127,20 @@ export default function SubjectPage() {
           {!isLoading && !isError && (
             <div className="space-y-2">
               {filtered.map((ch) => (
-                <div
+                <button
                   key={ch.id}
-                  className="group flex items-center gap-2 px-4 py-3 rounded-lg bg-card border border-border hover:border-primary/40 transition-all"
+                  onClick={() => handleChapterClick(ch)}
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border hover:border-primary/40 transition-all"
                 >
-                  <button
-                    className="flex-1 text-left flex items-center gap-3"
-                    onClick={() => handleChapterClick(ch)}
-                  >
-                    <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-medium text-foreground">{ch.title}</span>
-                    <div className="ml-auto flex gap-1">
-                      {ch.notesUrl && <Badge variant="secondary" className="text-xs">Notes</Badge>}
-                      {ch.audioUrl && <Badge variant="secondary" className="text-xs">Audio</Badge>}
-                      {ch.quizQuestions.length > 0 && <Badge variant="secondary" className="text-xs">Quiz</Badge>}
-                      {ch.flashcards.length > 0 && <Badge variant="secondary" className="text-xs">Cards</Badge>}
-                    </div>
-                  </button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <span className="sr-only">Delete</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Chapter</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete "{ch.title}"? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(ch.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {deleteChapterMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            'Delete'
-                          )}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+                  <BookOpen className="w-4 h-4 text-primary shrink-0" />
+                  <span className="font-medium text-foreground">{ch.title}</span>
+                  <div className="ml-auto flex gap-1">
+                    {ch.notesUrl && <Badge variant="secondary" className="text-xs">Notes</Badge>}
+                    {ch.audioUrl && <Badge variant="secondary" className="text-xs">Audio</Badge>}
+                    {ch.quizQuestions.length > 0 && <Badge variant="secondary" className="text-xs">Quiz</Badge>}
+                    {ch.flashcards.length > 0 && <Badge variant="secondary" className="text-xs">Cards</Badge>}
+                  </div>
+                </button>
               ))}
             </div>
           )}
