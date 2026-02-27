@@ -136,7 +136,7 @@ export default function SubjectPage() {
                   <span className="font-medium text-foreground">{ch.title}</span>
                   <div className="ml-auto flex gap-1">
                     {ch.notesUrl && <Badge variant="secondary" className="text-xs">Notes</Badge>}
-                    {ch.audioUrl && <Badge variant="secondary" className="text-xs">Audio</Badge>}
+                    {ch.audioUrl1 && <Badge variant="secondary" className="text-xs">Audio</Badge>}
                     {ch.quizQuestions.length > 0 && <Badge variant="secondary" className="text-xs">Quiz</Badge>}
                     {ch.flashcards.length > 0 && <Badge variant="secondary" className="text-xs">Cards</Badge>}
                   </div>

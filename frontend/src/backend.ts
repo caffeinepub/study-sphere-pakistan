@@ -97,8 +97,7 @@ export interface PdfEntryInput {
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
-export interface ChapterSnapshot {
-    id: bigint;
+export interface ChapterInput {
     title: string;
     notesLabel1: string;
     notesLabel2: string;
@@ -108,12 +107,8 @@ export interface ChapterSnapshot {
     notesUrl1: string;
     notesUrl2: string;
     subject: string;
-    audioMimeType2: string;
-    createdAt: bigint;
-    audioBlob2?: ExternalBlob;
-    audioMimeType: string;
-    audioBlob?: ExternalBlob;
-    audioUrl: string;
+    audioUrl1: string;
+    audioUrl2: string;
     notesUrl: string;
     quizQuestions: string;
     flashcards: string;
@@ -128,7 +123,8 @@ export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
 }
-export interface ChapterInput {
+export interface Chapter {
+    id: bigint;
     title: string;
     notesLabel1: string;
     notesLabel2: string;
@@ -138,9 +134,9 @@ export interface ChapterInput {
     notesUrl1: string;
     notesUrl2: string;
     subject: string;
-    audioMimeType2: string;
-    audioMimeType: string;
-    audioUrl: string;
+    createdAt: bigint;
+    audioUrl1: string;
+    audioUrl2: string;
     notesUrl: string;
     quizQuestions: string;
     flashcards: string;
@@ -158,23 +154,15 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     addChapter(input: ChapterInput): Promise<bigint>;
     addPdfEntry(input: PdfEntryInput): Promise<bigint>;
-    deleteAudioData(chapterId: bigint): Promise<boolean>;
-    deleteAudioData2(chapterId: bigint): Promise<boolean>;
     deleteChapter(id: bigint): Promise<boolean>;
     deletePdfEntry(id: bigint): Promise<boolean>;
-    finalizeAudioUpload(chapterId: bigint, totalChunks: bigint): Promise<boolean>;
-    finalizeAudioUpload2(chapterId: bigint, totalChunks: bigint): Promise<boolean>;
-    getAllChapters(): Promise<Array<ChapterSnapshot>>;
+    getAllChapters(): Promise<Array<Chapter>>;
     getAllPdfEntries(): Promise<Array<PdfEntry>>;
-    getAudioData(chapterId: bigint): Promise<Uint8Array | null>;
-    getAudioData2(chapterId: bigint): Promise<Uint8Array | null>;
-    getChapter(id: bigint): Promise<ChapterSnapshot | null>;
+    getChapter(id: bigint): Promise<Chapter | null>;
     updateChapter(id: bigint, input: ChapterInput): Promise<boolean>;
     updatePdfEntry(id: bigint, input: PdfEntryInput): Promise<boolean>;
-    uploadAudioChunk(chapterId: bigint, chunkIndex: bigint, totalChunks: bigint, data: Uint8Array): Promise<boolean>;
-    uploadAudioChunk2(chapterId: bigint, chunkIndex: bigint, totalChunks: bigint, data: Uint8Array): Promise<boolean>;
 }
-import type { ChapterSnapshot as _ChapterSnapshot, ExternalBlob as _ExternalBlob, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { Chapter as _Chapter, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -289,34 +277,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async deleteAudioData(arg0: bigint): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.deleteAudioData(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.deleteAudioData(arg0);
-            return result;
-        }
-    }
-    async deleteAudioData2(arg0: bigint): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.deleteAudioData2(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.deleteAudioData2(arg0);
-            return result;
-        }
-    }
     async deleteChapter(arg0: bigint): Promise<boolean> {
         if (this.processError) {
             try {
@@ -345,46 +305,18 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async finalizeAudioUpload(arg0: bigint, arg1: bigint): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.finalizeAudioUpload(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.finalizeAudioUpload(arg0, arg1);
-            return result;
-        }
-    }
-    async finalizeAudioUpload2(arg0: bigint, arg1: bigint): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.finalizeAudioUpload2(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.finalizeAudioUpload2(arg0, arg1);
-            return result;
-        }
-    }
-    async getAllChapters(): Promise<Array<ChapterSnapshot>> {
+    async getAllChapters(): Promise<Array<Chapter>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllChapters();
-                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+                return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllChapters();
-            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+            return result;
         }
     }
     async getAllPdfEntries(): Promise<Array<PdfEntry>> {
@@ -401,46 +333,18 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getAudioData(arg0: bigint): Promise<Uint8Array | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getAudioData(arg0);
-                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getAudioData(arg0);
-            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getAudioData2(arg0: bigint): Promise<Uint8Array | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getAudioData2(arg0);
-                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getAudioData2(arg0);
-            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getChapter(arg0: bigint): Promise<ChapterSnapshot | null> {
+    async getChapter(arg0: bigint): Promise<Chapter | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getChapter(arg0);
-                return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getChapter(arg0);
-            return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async updateChapter(arg0: bigint, arg1: ChapterInput): Promise<boolean> {
@@ -471,52 +375,9 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async uploadAudioChunk(arg0: bigint, arg1: bigint, arg2: bigint, arg3: Uint8Array): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.uploadAudioChunk(arg0, arg1, arg2, arg3);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.uploadAudioChunk(arg0, arg1, arg2, arg3);
-            return result;
-        }
-    }
-    async uploadAudioChunk2(arg0: bigint, arg1: bigint, arg2: bigint, arg3: Uint8Array): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.uploadAudioChunk2(arg0, arg1, arg2, arg3);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.uploadAudioChunk2(arg0, arg1, arg2, arg3);
-            return result;
-        }
-    }
-}
-async function from_candid_ChapterSnapshot_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ChapterSnapshot): Promise<ChapterSnapshot> {
-    return await from_candid_record_n10(_uploadFile, _downloadFile, value);
-}
-async function from_candid_ExternalBlob_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
-    return await _downloadFile(value);
 }
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
-}
-async function from_candid_opt_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ExternalBlob]): Promise<ExternalBlob | null> {
-    return value.length === 0 ? null : await from_candid_ExternalBlob_n12(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Uint8Array]): Uint8Array | null {
-    return value.length === 0 ? null : value[0];
-}
-async function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ChapterSnapshot]): Promise<ChapterSnapshot | null> {
-    return value.length === 0 ? null : await from_candid_ChapterSnapshot_n9(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
     return value.length === 0 ? null : value[0];
@@ -524,68 +385,8 @@ function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-async function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    id: bigint;
-    title: string;
-    notesLabel1: string;
-    notesLabel2: string;
-    audioLabel1: string;
-    audioLabel2: string;
-    classNumber: string;
-    notesUrl1: string;
-    notesUrl2: string;
-    subject: string;
-    audioMimeType2: string;
-    createdAt: bigint;
-    audioBlob2: [] | [_ExternalBlob];
-    audioMimeType: string;
-    audioBlob: [] | [_ExternalBlob];
-    audioUrl: string;
-    notesUrl: string;
-    quizQuestions: string;
-    flashcards: string;
-}): Promise<{
-    id: bigint;
-    title: string;
-    notesLabel1: string;
-    notesLabel2: string;
-    audioLabel1: string;
-    audioLabel2: string;
-    classNumber: string;
-    notesUrl1: string;
-    notesUrl2: string;
-    subject: string;
-    audioMimeType2: string;
-    createdAt: bigint;
-    audioBlob2?: ExternalBlob;
-    audioMimeType: string;
-    audioBlob?: ExternalBlob;
-    audioUrl: string;
-    notesUrl: string;
-    quizQuestions: string;
-    flashcards: string;
-}> {
-    return {
-        id: value.id,
-        title: value.title,
-        notesLabel1: value.notesLabel1,
-        notesLabel2: value.notesLabel2,
-        audioLabel1: value.audioLabel1,
-        audioLabel2: value.audioLabel2,
-        classNumber: value.classNumber,
-        notesUrl1: value.notesUrl1,
-        notesUrl2: value.notesUrl2,
-        subject: value.subject,
-        audioMimeType2: value.audioMimeType2,
-        createdAt: value.createdAt,
-        audioBlob2: record_opt_to_undefined(await from_candid_opt_n11(_uploadFile, _downloadFile, value.audioBlob2)),
-        audioMimeType: value.audioMimeType,
-        audioBlob: record_opt_to_undefined(await from_candid_opt_n11(_uploadFile, _downloadFile, value.audioBlob)),
-        audioUrl: value.audioUrl,
-        notesUrl: value.notesUrl,
-        quizQuestions: value.quizQuestions,
-        flashcards: value.flashcards
-    };
+function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Chapter]): Chapter | null {
+    return value.length === 0 ? null : value[0];
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     success: [] | [boolean];
@@ -598,9 +399,6 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         success: record_opt_to_undefined(from_candid_opt_n6(_uploadFile, _downloadFile, value.success)),
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
-}
-async function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ChapterSnapshot>): Promise<Array<ChapterSnapshot>> {
-    return await Promise.all(value.map(async (x)=>await from_candid_ChapterSnapshot_n9(_uploadFile, _downloadFile, x)));
 }
 function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
     return to_candid_record_n3(_uploadFile, _downloadFile, value);

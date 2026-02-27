@@ -1,7 +1,7 @@
-// Utility to map between backend ChapterSnapshot/PdfEntry types (bigint IDs, JSON strings)
+// Utility to map between backend Chapter/PdfEntry types (bigint IDs, JSON strings)
 // and the frontend Chapter/PdfEntry types (string IDs, parsed arrays).
 
-import type { ChapterSnapshot, PdfEntry as BackendPdfEntry } from "../backend";
+import type { Chapter as BackendChapter, PdfEntry as BackendPdfEntry } from "../backend";
 import type { Chapter, PdfEntry, QuizQuestion, FlashcardItem } from "../types/chapter";
 
 function safeParseJson<T>(json: string, fallback: T): T {
@@ -13,7 +13,7 @@ function safeParseJson<T>(json: string, fallback: T): T {
   }
 }
 
-export function mapBackendChapter(bc: ChapterSnapshot): Chapter {
+export function mapBackendChapter(bc: BackendChapter): Chapter {
   return {
     id: bc.id.toString(),
     title: bc.title,
@@ -26,14 +26,11 @@ export function mapBackendChapter(bc: ChapterSnapshot): Chapter {
     notesLabel2: bc.notesLabel2 ?? "",
     audioLabel1: bc.audioLabel1 ?? "",
     audioLabel2: bc.audioLabel2 ?? "",
-    audioUrl: bc.audioUrl,
-    audioMimeType: bc.audioMimeType || "audio/mpeg",
-    audioMimeType2: bc.audioMimeType2 ?? "",
+    audioUrl1: bc.audioUrl1 ?? "",
+    audioUrl2: bc.audioUrl2 ?? "",
     quizQuestions: safeParseJson<QuizQuestion[]>(bc.quizQuestions, []),
     flashcards: safeParseJson<FlashcardItem[]>(bc.flashcards, []),
     createdAt: Number(bc.createdAt),
-    hasAudioBlob: bc.audioBlob !== undefined && bc.audioBlob !== null,
-    hasAudioBlob2: bc.audioBlob2 !== undefined && bc.audioBlob2 !== null,
   };
 }
 

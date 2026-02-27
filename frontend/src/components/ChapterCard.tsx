@@ -13,7 +13,7 @@ export default function ChapterCard({ chapter }: ChapterCardProps) {
 
   const features = [
     chapter.notesUrl && { icon: FileText, label: 'Notes' },
-    chapter.audioUrl && { icon: Music, label: 'Audio' },
+    chapter.audioUrl1 && { icon: Music, label: 'Audio' },
     chapter.quizQuestions && chapter.quizQuestions.length > 0 && { icon: HelpCircle, label: 'Quiz' },
     chapter.flashcards && chapter.flashcards.length > 0 && { icon: Layers, label: 'Cards' },
   ].filter(Boolean) as { icon: React.ElementType; label: string }[];

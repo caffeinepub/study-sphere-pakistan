@@ -83,18 +83,16 @@ export default function AudioPlayer({ url }: AudioPlayerProps) {
   const handlePause = () => setIsPlaying(false);
   const handleError = () => setHasError(true);
 
-  // For blob URLs, don't show external link (they're not shareable)
-  const isBlobUrl = url.startsWith("blob:");
-  const isExternalUrl = !isBlobUrl && (url.startsWith("http://") || url.startsWith("https://"));
+  const isExternalUrl = url.startsWith("http://") || url.startsWith("https://");
 
   if (hasError) {
     return (
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 flex flex-col items-center gap-3 text-center">
         <AlertCircle className="h-10 w-10 text-destructive opacity-70" />
         <div>
-          <p className="font-medium text-foreground">Unable to load audio</p>
+          <p className="font-medium text-foreground">Unable to play audio directly</p>
           <p className="text-sm text-muted-foreground mt-1">
-            The audio file could not be played in your browser.
+            This link may require opening in a browser or external app.
           </p>
         </div>
         {isExternalUrl && (
@@ -126,23 +124,24 @@ export default function AudioPlayer({ url }: AudioPlayerProps) {
         preload="metadata"
       />
 
-      {/* Play/Pause + Time */}
-      <div className="flex items-center gap-4">
+      {/* Play / Seek row */}
+      <div className="flex items-center gap-3">
         <Button
+          type="button"
           variant="default"
           size="icon"
           onClick={handlePlayPause}
-          className="h-12 w-12 rounded-full shrink-0"
+          className="shrink-0 rounded-full w-10 h-10"
         >
-          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </Button>
 
         <div className="flex-1 space-y-1">
           <Slider
-            value={[currentTime]}
             min={0}
             max={duration || 1}
             step={0.1}
+            value={[currentTime]}
             onValueChange={handleSeek}
             className="w-full"
           />
@@ -153,20 +152,26 @@ export default function AudioPlayer({ url }: AudioPlayerProps) {
         </div>
       </div>
 
-      {/* Volume */}
+      {/* Volume row */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={handleMuteToggle} className="h-8 w-8 shrink-0">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={handleMuteToggle}
+          className="shrink-0 h-8 w-8"
+        >
           {isMuted || volume === 0 ? (
-            <VolumeX className="h-4 w-4" />
+            <VolumeX className="w-4 h-4" />
           ) : (
-            <Volume2 className="h-4 w-4" />
+            <Volume2 className="w-4 h-4" />
           )}
         </Button>
         <Slider
-          value={[isMuted ? 0 : volume]}
           min={0}
           max={1}
           step={0.01}
+          value={[isMuted ? 0 : volume]}
           onValueChange={handleVolumeChange}
           className="w-28"
         />
@@ -175,10 +180,10 @@ export default function AudioPlayer({ url }: AudioPlayerProps) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
           >
-            <ExternalLink className="h-3 w-3" />
-            Open in browser
+            <ExternalLink className="w-3 h-3" />
+            Open link
           </a>
         )}
       </div>

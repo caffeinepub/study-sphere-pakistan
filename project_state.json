@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 29,
-  "summary": "Study Sphere Pakistan — a fully responsive, PWA-enabled educational website for Pakistani students (9th–12th class + MDCAT prep). Features include animated splash screen, class/subject/chapter navigation, admin panel at /admin URL (open-access, no password) with entry point hidden inside the Terms & Conditions page as the subtle word 'Sia' at the end of the last condition — clicking it navigates to /admin, upload/edit/delete chapters with manual entry forms for quizzes and flashcards, two notes links per chapter (each with optional custom label) and two audio files per chapter (each with optional custom label) with direct upload (up to 200MB, chunked, stored as binary in Motoko canister), HTML5 audio player, interactive MCQ quiz, 3D flip flashcards, progress tracking, recently viewed, MDCAT prep section, Terms & Conditions, Support Us page (Easypaisa: 03320335528), dark mode toggle, and PWA/offline support. On the chapter page, Notes and Audio tabs show named buttons for each available item using admin-entered labels (fallback: 'Notes 1'/'Notes 2', 'Audio 1'/'Audio 2'). Edit and Delete buttons are shown only in the Admin Panel — hidden from all student-facing subject/chapter pages. Chapters and all uploaded material (quiz, flashcards, notes URLs, audio binaries) are stored permanently in a Motoko backend canister on the Internet Computer for cross-device sync. User-specific data (progress, recently viewed) remains device-local in LocalStorage. Optimistic UI updates ensure instant chapter list changes on the frontend. Full color contrast audit applied across light and dark mode.",
+  "projectStateVersion": 33,
+  "summary": "Study Sphere Pakistan — a fully responsive, PWA-enabled educational website for Pakistani students (9th–12th class + MDCAT prep). Features include animated splash screen, class/subject/chapter navigation, admin panel at /admin URL (open-access, no password) with entry point hidden inside the Terms & Conditions page as the subtle word 'Sia' at the end of the last condition — clicking it navigates to /admin, upload/edit/delete chapters with manual entry forms for quizzes and flashcards, two notes links per chapter (each with optional custom label) and two audio URL fields per chapter (each with optional custom label, accepting any URL type including YouTube, Google Drive, direct links), HTML5 audio player, interactive MCQ quiz, 3D flip flashcards, progress tracking, recently viewed, MDCAT prep section, Terms & Conditions, Support Us page (Easypaisa: 03320335528), dark mode toggle, and PWA/offline support. On the chapter page, Notes and Audio tabs show named buttons for each available item using admin-entered labels (fallback: 'Notes 1'/'Notes 2', 'Audio 1'/'Audio 2'). Edit and Delete buttons are shown only in the Admin Panel — hidden from all student-facing subject/chapter pages. Chapters and all uploaded material (quiz, flashcards, notes URLs, audio URLs) are stored permanently in a Motoko backend canister on the Internet Computer for cross-device sync. User-specific data (progress, recently viewed) remains device-local in LocalStorage. Optimistic UI updates ensure instant chapter list changes on the frontend. Full color contrast audit applied across light and dark mode.",
   "architectural_notes": [
     "PWA with service worker for offline support and installability",
     "Medical/academic theme: blue, white, soft gradients; mobile-first responsive design",
@@ -10,7 +10,6 @@
     "Cross-device sync: all devices fetch chapters from the shared canister in real time; user progress and recently viewed remain device-local in LocalStorage",
     "Favorites feature removed entirely — no per-user saved favorites",
     "Admin panel access is security-through-obscurity: no password, entry point hidden as a subtle element inside the Terms & Conditions page",
-    "Audio files stored as binary data (chunked upload) in the Motoko canister — max 200MB per file; Edit/Delete chapter buttons visible only in the Admin Panel, not on student-facing pages",
     "Each chapter supports two notes links (notesUrl1/notesLabel1, notesUrl2/notesLabel2) and two audio files (with labels audioLabel1/audioLabel2); chapter page shows named selection buttons for each available item"
   ],
   "known_issues": [],
@@ -399,6 +398,62 @@
         "REQ-60"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-chapterform-tsx-add-a-visible-save-progress-indicator-near-the-save-button-that-displays-saving-x-0-100-updating-in-real-time-as-each-sequential-step-completes-chapter-metadata-create-update-20-audio-file-1-upload-chunks-scaled-from-20-to-55-proportionally-by-chunk-index-audio-file-1-finalize-60-audio-file-2-upload-chunks-scaled-from-60-to-90-proportionally-audio-file-2-finalize-95-and-final-completion-100-display-this-as-both-a-text-label-and-a-progress-bar-element-reset-progress-to-0-and-hide-the-indicator-when-not-saving",
+      "title": "In frontend/src/components/ChapterForm.tsx, add a visible save progress indicator near the Save button that displays 'Saving... X%' (0–100%) updating in real time as each sequential step completes: chapter metadata create/update (~20%), audio file 1 upload chunks (scaled from 20% to 55% proportionally by chunk index), audio file 1 finalize (~60%), audio file 2 upload chunks (scaled from 60% to 90% proportionally), audio file 2 finalize (~95%), and final completion (100%). Display this as both a text label and a progress bar element. Reset progress to 0 and hide the indicator when not saving.",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-stuck-failing-save-in-chapterform-by-restructuring-the-save-flow-to-handle-canister-call-timeouts-gracefully-each-canister-call-createchapter-updatechapter-uploadaudiochunk-uploadaudiochunk2-finalizeaudioupload-finalizeaudioupload2-must-be-wrapped-with-a-per-call-timeout-of-at-least-60-seconds-if-a-canister-call-times-out-or-returns-an-error-retry-it-up-to-2-additional-times-with-a-short-delay-500ms-before-reporting-failure-if-all-retries-are-exhausted-display-a-specific-error-message-identifying-which-step-failed-e-g-failed-to-finalize-audio-upload-please-try-again-and-do-not-leave-the-form-in-an-indefinite-loading-state",
+      "title": "Fix the stuck/failing save in ChapterForm by restructuring the save flow to handle canister call timeouts gracefully. Each canister call (createChapter, updateChapter, uploadAudioChunk, uploadAudioChunk2, finalizeAudioUpload, finalizeAudioUpload2) must be wrapped with a per-call timeout of at least 60 seconds. If a canister call times out or returns an error, retry it up to 2 additional times with a short delay (500ms) before reporting failure. If all retries are exhausted, display a specific error message identifying which step failed (e.g., 'Failed to finalize audio upload. Please try again.') and do not leave the form in an indefinite loading state.",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-optimize-the-sequential-save-steps-in-chapterform-to-reduce-unnecessary-delays-between-steps-eliminate-any-artificial-waits-or-polling-delays-between-chapter-metadata-save-audio-chunk-uploads-and-finalization-calls-ensure-that-each-step-begins-immediately-after-the-previous-one-resolves-successfully-without-waiting-for-ui-re-renders-or-unrelated-state-updates-pass-the-chapter-id-returned-from-createchapter-directly-to-the-audio-upload-utility-functions-without-any-intermediate-async-delays",
+      "title": "Optimize the sequential save steps in ChapterForm to reduce unnecessary delays between steps. Eliminate any artificial waits or polling delays between chapter metadata save, audio chunk uploads, and finalization calls. Ensure that each step begins immediately after the previous one resolves successfully without waiting for UI re-renders or unrelated state updates. Pass the chapter ID returned from createChapter directly to the audio upload utility functions without any intermediate async delays.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-utils-audiouploadservice-ts-and-the-second-audio-upload-utility-uploadaudiofile2-to-propagate-per-chunk-progress-callbacks-accurately-so-that-chapterform-can-compute-overall-save-percentage-each-upload-utility-must-call-its-onprogress-callback-with-a-value-from-0-to-100-as-each-chunk-is-sent-and-after-finalization-the-progress-value-after-finalization-must-be-exactly-100-errors-thrown-by-the-upload-utility-must-include-a-descriptive-message-string-so-chapterform-can-display-it-to-the-admin",
+      "title": "Update frontend/src/utils/audioUploadService.ts and the second audio upload utility (uploadAudioFile2) to propagate per-chunk progress callbacks accurately so that ChapterForm can compute overall save percentage. Each upload utility must call its onProgress callback with a value from 0 to 100 as each chunk is sent and after finalization. The progress value after finalization must be exactly 100. Errors thrown by the upload utility must include a descriptive message string so ChapterForm can display it to the admin.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-chapterform-tsx-replace-both-audio-1-and-audio-2-file-upload-inputs-and-their-associated-progress-bars-file-upload-state-and-chunked-upload-logic-with-plain-text-url-input-fields-audio-1-must-have-a-text-input-for-the-audio-url-placeholder-audio-1-url-any-link-youtube-google-drive-direct-etc-and-an-adjacent-optional-label-field-placeholder-audio-1-label-audio-2-must-have-a-text-input-for-the-audio-url-placeholder-audio-2-url-any-link-youtube-google-drive-direct-etc-and-an-adjacent-optional-label-field-placeholder-audio-2-label-remove-all-file-state-variables-chunked-upload-calls-uploadaudiochunk-uploadaudiochunk2-finalizeaudioupload-finalizeaudioupload2-upload-progress-state-and-upload-progress-bar-ui-elements-related-to-audio-the-save-button-flow-must-no-longer-perform-any-audio-upload-steps-chapter-metadata-including-the-two-audio-url-strings-and-their-labels-is-saved-directly-via-createchapter-or-updatechapter-saving-a-chapter-with-only-a-title-must-still-work-all-audio-url-fields-remain-optional",
+      "title": "In frontend/src/components/ChapterForm.tsx, replace both Audio 1 and Audio 2 file upload inputs (and their associated progress bars, file-upload state, and chunked-upload logic) with plain text URL input fields. Audio 1 must have a text input for the audio URL (placeholder: 'Audio 1 URL — any link (YouTube, Google Drive, direct, etc.)') and an adjacent optional label field (placeholder: 'Audio 1 Label'). Audio 2 must have a text input for the audio URL (placeholder: 'Audio 2 URL — any link (YouTube, Google Drive, direct, etc.)') and an adjacent optional label field (placeholder: 'Audio 2 Label'). Remove all File state variables, chunked-upload calls (uploadAudioChunk, uploadAudioChunk2, finalizeAudioUpload, finalizeAudioUpload2), upload progress state, and upload progress bar UI elements related to audio. The Save button flow must no longer perform any audio upload steps — chapter metadata (including the two audio URL strings and their labels) is saved directly via createChapter or updateChapter. Saving a chapter with only a title must still work; all audio URL fields remain optional.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-chapter-page-audio-tab-in-frontend-src-pages-chapterpage-tsx-and-the-audioplayer-component-in-frontend-src-components-audioplayer-tsx-to-play-audio-using-the-stored-url-strings-audiourl-audiourl1-or-audiourl2-fields-on-the-chapter-object-directly-without-fetching-binary-data-from-the-canister-when-a-chapter-has-one-or-two-audio-urls-the-audio-tab-must-show-named-buttons-cards-for-each-available-audio-item-using-the-admin-entered-label-audiolabel1-audiolabel2-falling-back-to-audio-1-audio-2-clicking-a-named-button-passes-the-corresponding-url-string-directly-to-the-audioplayer-for-playback-remove-any-calls-to-getaudiodata-or-getaudiodata2-canister-functions-and-remove-any-url-createobjecturl-url-revokeobjecturl-logic-that-was-used-for-binary-audio-blobs-the-audioplayer-must-accept-the-url-as-is-and-attempt-playback-displaying-an-error-message-only-if-the-browser-cannot-load-the-resource-if-no-audio-url-is-stored-for-either-slot-show-the-existing-no-audio-available-empty-state-ui",
+      "title": "Update the Chapter page Audio tab in frontend/src/pages/ChapterPage.tsx and the AudioPlayer component in frontend/src/components/AudioPlayer.tsx to play audio using the stored URL strings (audioUrl, audioUrl1, or audioUrl2 fields on the Chapter object) directly — without fetching binary data from the canister. When a chapter has one or two audio URLs, the Audio tab must show named buttons/cards for each available audio item using the admin-entered label (audioLabel1 / audioLabel2), falling back to 'Audio 1' / 'Audio 2'. Clicking a named button passes the corresponding URL string directly to the AudioPlayer for playback. Remove any calls to getAudioData or getAudioData2 canister functions, and remove any URL.createObjectURL / URL.revokeObjectURL logic that was used for binary audio blobs. The AudioPlayer must accept the URL as-is and attempt playback, displaying an error message only if the browser cannot load the resource. If no audio URL is stored for either slot, show the existing 'No audio available' empty-state UI.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-utils-chaptermapper-ts-to-map-the-audiourl1-and-audiourl2-backend-fields-to-the-frontend-chapter-type-and-update-frontend-src-types-chapter-ts-to-include-audiourl1-and-audiourl2-as-optional-string-fields-on-the-chapter-interface-remove-any-frontend-references-to-hasaudio-hasaudio2-or-binary-audio-blob-fields-that-were-used-for-the-chunked-upload-feature",
+      "title": "Update frontend/src/utils/chapterMapper.ts to map the audioUrl1 and audioUrl2 backend fields to the frontend Chapter type, and update frontend/src/types/chapter.ts to include audioUrl1 and audioUrl2 as optional string fields on the Chapter interface. Remove any frontend references to hasAudio, hasAudio2, or binary audio blob fields that were used for the chunked upload feature.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -537,23 +592,9 @@
       "status": "pending"
     },
     {
-      "id": "AR-29",
-      "summary": "Replace external audio URL field in admin panel with a direct audio file upload input (up to 200MB). Store audio as binary data in the Motoko backend canister using chunked uploading to support large files within IC per-message limits. Audio playback uses the stored binary data.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-30",
       "summary": "Hide Edit and Delete buttons from all student-facing chapter list views (SubjectPage, MDCATSubjectPage, etc.). Both buttons must remain fully functional only inside the Admin Panel at /admin.",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-31",
-      "summary": "Extend the Motoko backend canister in backend/main.mo to support chunked audio file upload and retrieval. Add the following stable-storage functions: (1) uploadAudioChunk(chapterId: Nat, chunkIndex: Nat, totalChunks: Nat, data: Blob) -> async Bool — receives one chunk of binary audio data and appends it to a stable buffer keyed by chapterId; (2) finalizeAudioUpload(chapterId: Nat, totalChunks: Nat) -> async Bool — assembles all received chunks into a single stable Blob for that chapter and clears the temporary chunk buffer; (3) getAudioData(chapterId: Nat) -> async ?Blob — returns the complete assembled audio Blob for a chapter; (4) deleteAudioData(chapterId: Nat) -> async Bool — removes the stored audio Blob and any partial chunk buffers for that chapter. All audio data must be stored in stable variables so it survives canister upgrades. The existing Chapter record must add an audioMimeType: Text field (e.g. 'audio/mpeg', 'audio/mp4') and retain the existing audioUrl: Text field for backwards compatibility (audioUrl can be empty when a file is uploaded). The per-message chunk size must be set to at most 1.5MB to stay within the Internet Computer's ~2MB ingress message limit, allowing files up to 200MB to be uploaded across multiple calls.",
-      "reqIds": [
-        "REQ-47"
-      ],
       "status": "pending"
     },
     {
@@ -575,34 +616,24 @@
       "status": "pending"
     },
     {
-      "id": "AR-35",
-      "summary": "Extend the Motoko backend Chapter record in backend/main.mo to add the following new fields: notesUrl1 (Text), notesLabel1 (Text), notesUrl2 (Text), notesLabel2 (Text), audioLabel1 (Text), audioLabel2 (Text), audioMimeType2 (Text). Add four new stable-storage chunked audio functions for a second audio binary: uploadAudioChunk2(chapterId: Nat, chunkIndex: Nat, totalChunks: Nat, data: Blob) -> async Bool, finalizeAudioUpload2(chapterId: Nat, totalChunks: Nat) -> async Bool, getAudioData2(chapterId: Nat) -> async ?Blob, deleteAudioData2(chapterId: Nat) -> async Bool. All new audio data must be stored in stable variables so it survives canister upgrades. Existing fields (notesUrl, audioUrl, audioMimeType, uploadAudioChunk, finalizeAudioUpload, getAudioData, deleteAudioData) must remain intact and unchanged for backwards compatibility.",
-      "reqIds": [
-        "REQ-52"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-36",
-      "summary": "Update backend/migration.mo to migrate existing Chapter records to the new schema by adding default empty string values for notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, and audioMimeType2 on any chapter that lacks these fields.",
-      "reqIds": [
-        "REQ-53"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-38",
-      "summary": "Update frontend/src/utils/audioUploadService.ts to add a second upload utility function (e.g. uploadAudioFile2) that performs chunked upload for the second audio slot using uploadAudioChunk2 and finalizeAudioUpload2 canister functions, with the same chunk size (1.5MB max), sequential upload, progress callback (0–100%), and promise-based completion/error handling as the existing first audio upload utility.",
-      "reqIds": [
-        "REQ-55"
-      ],
-      "status": "pending"
-    },
-    {
       "id": "AR-42",
       "summary": "Implement optimistic UI updates for chapter save operations in the admin panel. When the admin submits the ChapterForm to create or update a chapter, immediately update the TanStack Query cache with the new/edited chapter data on the frontend before the canister write completes. If the canister write fails, revert the cache to the previous state and display an error message. This eliminates the perceived save delay so the chapter list appears to update instantly.",
       "reqIds": [
         "REQ-59"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Replace both audio file upload inputs (Audio 1 and Audio 2) in ChapterForm with URL/link text fields that accept any type of audio link (YouTube, Google Drive, direct audio URLs, etc.). Update Chapter page Audio tab to play audio using these URLs directly via the AudioPlayer component.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "Update the Motoko backend (backend/main.mo) to ensure that the ChapterInput and Chapter types include audioUrl1 (Text) and audioUrl2 (Text) fields for storing the two audio URL strings, in addition to the existing audioLabel1 and audioLabel2 fields. Remove any backend functions or stable variables exclusively used for binary audio storage for the canister-side chunked upload feature (uploadAudioChunk, uploadAudioChunk2, finalizeAudioUpload, finalizeAudioUpload2, getAudioData, getAudioData2, deleteAudioData, deleteAudioData2) if they are no longer needed now that audio is stored as URLs. Preserve all other chapter fields and CRUD functions unchanged.",
+      "reqIds": [
+        "REQ-67"
       ],
       "status": "pending"
     }

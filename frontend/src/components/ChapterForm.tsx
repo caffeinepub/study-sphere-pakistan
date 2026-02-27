@@ -1,13 +1,13 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { useAddChapter, useUpdateChapter } from "../hooks/useQueries";
+import { useActor } from "../hooks/useActor";
 import type { Chapter, QuizQuestion, FlashcardItem } from "../types/chapter";
 import type { ChapterInput } from "../backend";
-import { Music, Upload, CheckCircle, AlertCircle, X, Plus, Trash2, Loader2 } from "lucide-react";
-import { uploadAudioFileToDataUrl } from "../utils/audioUploadService";
+import { Plus, Trash2, Loader2, Link } from "lucide-react";
+import { callWithRetry } from "../utils/callWithRetry";
 
 interface ChapterFormProps {
   chapter?: Chapter;
@@ -18,6 +18,7 @@ interface ChapterFormProps {
 export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFormProps) {
   const addChapter = useAddChapter();
   const updateChapter = useUpdateChapter();
+  const { actor } = useActor();
 
   const [title, setTitle] = useState(chapter?.title ?? "");
   const [classNumber, setClassNumber] = useState(chapter?.classNumber ?? "");
@@ -29,21 +30,11 @@ export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFor
   const [notesUrl2, setNotesUrl2] = useState(chapter?.notesUrl2 ?? "");
   const [notesLabel2, setNotesLabel2] = useState(chapter?.notesLabel2 ?? "");
 
-  // Audio 1 state
+  // Audio URL fields
   const [audioLabel1, setAudioLabel1] = useState(chapter?.audioLabel1 ?? "");
-  const [audioFile1, setAudioFile1] = useState<File | null>(null);
-  const [audio1Progress, setAudio1Progress] = useState(0);
-  const [audio1Status, setAudio1Status] = useState<"idle" | "uploading" | "success" | "error">("idle");
-  const [audio1Error, setAudio1Error] = useState("");
-  const audio1Ref = useRef<HTMLInputElement | null>(null);
-
-  // Audio 2 state
+  const [audioUrl1, setAudioUrl1] = useState(chapter?.audioUrl1 ?? "");
   const [audioLabel2, setAudioLabel2] = useState(chapter?.audioLabel2 ?? "");
-  const [audioFile2, setAudioFile2] = useState<File | null>(null);
-  const [audio2Progress, setAudio2Progress] = useState(0);
-  const [audio2Status, setAudio2Status] = useState<"idle" | "uploading" | "success" | "error">("idle");
-  const [audio2Error, setAudio2Error] = useState("");
-  const audio2Ref = useRef<HTMLInputElement | null>(null);
+  const [audioUrl2, setAudioUrl2] = useState(chapter?.audioUrl2 ?? "");
 
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
     chapter?.quizQuestions ?? []
@@ -52,52 +43,10 @@ export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFor
     chapter?.flashcards ?? []
   );
 
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
   const isEditing = !!chapter;
-  const hasExistingAudio1 = isEditing && (!!chapter?.audioUrl || chapter?.hasAudioBlob);
-  const hasExistingAudio2 = isEditing && chapter?.hasAudioBlob2;
-
-  const handleAudioFileChange = (
-    slot: 1 | 2,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 200 * 1024 * 1024) {
-      if (slot === 1) {
-        setAudio1Error("File size exceeds 200MB limit.");
-        setAudioFile1(null);
-      } else {
-        setAudio2Error("File size exceeds 200MB limit.");
-        setAudioFile2(null);
-      }
-      return;
-    }
-    if (slot === 1) {
-      setAudioFile1(file);
-      setAudio1Status("idle");
-      setAudio1Error("");
-    } else {
-      setAudioFile2(file);
-      setAudio2Status("idle");
-      setAudio2Error("");
-    }
-  };
-
-  const clearAudioFile = (slot: 1 | 2) => {
-    if (slot === 1) {
-      setAudioFile1(null);
-      setAudio1Status("idle");
-      setAudio1Error("");
-      setAudio1Progress(0);
-      if (audio1Ref.current) audio1Ref.current.value = "";
-    } else {
-      setAudioFile2(null);
-      setAudio2Status("idle");
-      setAudio2Error("");
-      setAudio2Progress(0);
-      if (audio2Ref.current) audio2Ref.current.value = "";
-    }
-  };
 
   // Quiz helpers
   const addQuestion = () =>
@@ -142,79 +91,65 @@ export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-
-    let audioUrl = chapter?.audioUrl ?? "";
-    let audioMimeType = chapter?.audioMimeType ?? "audio/mpeg";
-    let audioMimeType2 = chapter?.audioMimeType2 ?? "";
-
-    // Upload audio 1 if selected
-    if (audioFile1) {
-      setAudio1Status("uploading");
-      setAudio1Progress(0);
-      try {
-        const result = await uploadAudioFileToDataUrl(audioFile1, (pct) => {
-          setAudio1Progress(pct);
-        });
-        audioUrl = result.dataUrl;
-        audioMimeType = result.mimeType;
-        setAudio1Status("success");
-      } catch (err) {
-        setAudio1Status("error");
-        setAudio1Error(err instanceof Error ? err.message : "Audio 1 upload failed.");
-        return;
-      }
+    if (!actor) {
+      setSaveError("Actor not initialized. Please refresh and try again.");
+      return;
     }
 
-    // Upload audio 2 if selected
-    if (audioFile2) {
-      setAudio2Status("uploading");
-      setAudio2Progress(0);
-      try {
-        const result = await uploadAudioFileToDataUrl(audioFile2, (pct) => {
-          setAudio2Progress(pct);
-        });
-        audioMimeType2 = result.mimeType;
-        setAudio2Status("success");
-      } catch (err) {
-        setAudio2Status("error");
-        setAudio2Error(err instanceof Error ? err.message : "Audio 2 upload failed.");
-        return;
+    setIsSaving(true);
+    setSaveError("");
+
+    try {
+      const input: ChapterInput = {
+        title: title.trim(),
+        classNumber: classNumber.trim(),
+        subject: subject.trim(),
+        notesUrl: notesUrl1.trim(),
+        notesUrl1: notesUrl1.trim(),
+        notesLabel1: notesLabel1.trim(),
+        notesUrl2: notesUrl2.trim(),
+        notesLabel2: notesLabel2.trim(),
+        audioLabel1: audioLabel1.trim(),
+        audioLabel2: audioLabel2.trim(),
+        audioUrl1: audioUrl1.trim(),
+        audioUrl2: audioUrl2.trim(),
+        quizQuestions: JSON.stringify(quizQuestions),
+        flashcards: JSON.stringify(flashcards),
+      };
+
+      if (isEditing && chapter) {
+        const success = await callWithRetry(
+          () => actor.updateChapter(BigInt(chapter.id), input),
+          "Update chapter"
+        );
+        if (!success) throw new Error("Failed to update chapter");
+        updateChapter.mutate(
+          { id: chapter.id, input },
+          {
+            onSuccess: () => {
+              setIsSaving(false);
+              onSuccess?.();
+            },
+            onError: () => {
+              setIsSaving(false);
+              onSuccess?.();
+            },
+          }
+        );
+      } else {
+        await callWithRetry(
+          () => actor.addChapter(input),
+          "Create chapter"
+        );
+        setIsSaving(false);
+        onSuccess?.();
       }
-    }
-
-    const input: ChapterInput = {
-      title: title.trim(),
-      classNumber: classNumber.trim(),
-      subject: subject.trim(),
-      notesUrl: notesUrl1.trim(),
-      notesUrl1: notesUrl1.trim(),
-      notesLabel1: notesLabel1.trim(),
-      notesUrl2: notesUrl2.trim(),
-      notesLabel2: notesLabel2.trim(),
-      audioLabel1: audioLabel1.trim(),
-      audioLabel2: audioLabel2.trim(),
-      audioUrl,
-      audioMimeType,
-      audioMimeType2,
-      quizQuestions: JSON.stringify(quizQuestions),
-      flashcards: JSON.stringify(flashcards),
-    };
-
-    if (isEditing && chapter) {
-      updateChapter.mutate(
-        { id: chapter.id, input },
-        { onSuccess: () => onSuccess?.() }
-      );
-    } else {
-      addChapter.mutate(input, { onSuccess: () => onSuccess?.() });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Save failed. Please try again.";
+      setSaveError(msg);
+      setIsSaving(false);
     }
   };
-
-  const isSaving =
-    addChapter.isPending ||
-    updateChapter.isPending ||
-    audio1Status === "uploading" ||
-    audio2Status === "uploading";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -310,39 +245,67 @@ export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFor
         </div>
       </div>
 
-      {/* Audio Uploads */}
+      {/* Audio URLs */}
       <div className="space-y-3">
-        <Label className="text-sm font-semibold text-foreground">Audio Files (optional)</Label>
+        <Label className="text-sm font-semibold text-foreground">Audio Links (optional)</Label>
 
         {/* Audio 1 */}
-        <AudioUploadSlot
-          slot={1}
-          label={audioLabel1}
-          onLabelChange={setAudioLabel1}
-          file={audioFile1}
-          progress={audio1Progress}
-          status={audio1Status}
-          error={audio1Error}
-          hasExisting={!!hasExistingAudio1}
-          inputRef={audio1Ref}
-          onFileChange={(e) => handleAudioFileChange(1, e)}
-          onClear={() => clearAudioFile(1)}
-        />
+        <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Audio 1</p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="audioLabel1" className="text-xs">Label (optional)</Label>
+              <Input
+                id="audioLabel1"
+                value={audioLabel1}
+                onChange={(e) => setAudioLabel1(e.target.value)}
+                placeholder="e.g. Lecture 1, Part A"
+              />
+            </div>
+            <div>
+              <Label htmlFor="audioUrl1" className="text-xs">URL</Label>
+              <div className="relative">
+                <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="audioUrl1"
+                  value={audioUrl1}
+                  onChange={(e) => setAudioUrl1(e.target.value)}
+                  placeholder="Any link — YouTube, Google Drive, direct audio, etc."
+                  className="pl-9"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Audio 2 */}
-        <AudioUploadSlot
-          slot={2}
-          label={audioLabel2}
-          onLabelChange={setAudioLabel2}
-          file={audioFile2}
-          progress={audio2Progress}
-          status={audio2Status}
-          error={audio2Error}
-          hasExisting={!!hasExistingAudio2}
-          inputRef={audio2Ref}
-          onFileChange={(e) => handleAudioFileChange(2, e)}
-          onClear={() => clearAudioFile(2)}
-        />
+        <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Audio 2</p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="audioLabel2" className="text-xs">Label (optional)</Label>
+              <Input
+                id="audioLabel2"
+                value={audioLabel2}
+                onChange={(e) => setAudioLabel2(e.target.value)}
+                placeholder="e.g. Lecture 2, Part B"
+              />
+            </div>
+            <div>
+              <Label htmlFor="audioUrl2" className="text-xs">URL</Label>
+              <div className="relative">
+                <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="audioUrl2"
+                  value={audioUrl2}
+                  onChange={(e) => setAudioUrl2(e.target.value)}
+                  placeholder="Any link — YouTube, Google Drive, direct audio, etc."
+                  className="pl-9"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Quiz Questions */}
@@ -434,159 +397,31 @@ export default function ChapterForm({ chapter, onSuccess, onCancel }: ChapterFor
         ))}
       </div>
 
+      {/* Error */}
+      {saveError && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+          {saveError}
+        </p>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={!title.trim() || isSaving} className="flex-1">
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {audio1Status === "uploading" || audio2Status === "uploading"
-                ? "Processing audio..."
-                : "Saving..."}
-            </>
-          ) : isEditing ? (
-            "Update Chapter"
-          ) : (
-            "Save Chapter"
-          )}
-        </Button>
         {onCancel && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSaving}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving} className="flex-1">
             Cancel
           </Button>
         )}
-      </div>
-
-      {(addChapter.isError || updateChapter.isError) && (
-        <p className="text-sm text-destructive">
-          Failed to save chapter. Please try again.
-        </p>
-      )}
-    </form>
-  );
-}
-
-// ── Sub-component: AudioUploadSlot ────────────────────────────────────────────
-
-interface AudioUploadSlotProps {
-  slot: 1 | 2;
-  label: string;
-  onLabelChange: (v: string) => void;
-  file: File | null;
-  progress: number;
-  status: "idle" | "uploading" | "success" | "error";
-  error: string;
-  hasExisting: boolean;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
-}
-
-function AudioUploadSlot({
-  slot,
-  label,
-  onLabelChange,
-  file,
-  progress,
-  status,
-  error,
-  hasExisting,
-  inputRef,
-  onFileChange,
-  onClear,
-}: AudioUploadSlotProps) {
-  const inputId = `audioFile${slot}`;
-  const labelId = `audioLabel${slot}`;
-
-  return (
-    <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Audio {slot}</p>
-
-      <div>
-        <Label htmlFor={labelId} className="text-xs">Label (optional)</Label>
-        <Input
-          id={labelId}
-          value={label}
-          onChange={(e) => onLabelChange(e.target.value)}
-          placeholder={`e.g. Lecture ${slot}, Part ${slot}`}
-        />
-      </div>
-
-      <div className="space-y-2">
-        {hasExisting && !file && (
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-            <CheckCircle className="h-4 w-4 shrink-0" />
-            <span>Audio file uploaded. Select a new file to replace it.</span>
-          </div>
-        )}
-
-        <div className="flex items-center gap-3 flex-wrap">
-          <label
-            htmlFor={inputId}
-            className="flex items-center gap-2 cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-          >
-            <Upload className="h-4 w-4" />
-            {file ? "Change file" : "Choose audio file"}
-          </label>
-          <input
-            ref={inputRef}
-            id={inputId}
-            type="file"
-            accept="audio/*"
-            onChange={onFileChange}
-            className="hidden"
-          />
-          {file && (
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <Music className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-sm truncate text-foreground">{file.name}</span>
-              <span className="text-xs text-muted-foreground shrink-0">
-                ({(file.size / (1024 * 1024)).toFixed(1)} MB)
-              </span>
-              <button
-                type="button"
-                onClick={onClear}
-                className="ml-auto shrink-0 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+        <Button type="submit" disabled={isSaving || !title.trim()} className="flex-1">
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            isEditing ? "Update Chapter" : "Save Chapter"
           )}
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Supports MP3, WAV, OGG, M4A. Maximum size: 200MB.
-        </p>
-
-        {status === "uploading" && (
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Processing audio...</span>
-              <span>{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        )}
-
-        {status === "success" && (
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-            <CheckCircle className="h-4 w-4" />
-            <span>Audio ready to save!</span>
-          </div>
-        )}
-
-        {(status === "error" || error) && (
-          <div className="flex items-center gap-2 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4" />
-            <span>{error || "Audio processing failed. Please try again."}</span>
-          </div>
-        )}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 }

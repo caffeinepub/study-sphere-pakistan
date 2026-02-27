@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, CheckCircle, Circle, BookOpen, Headphones, HelpCircle, Layers, AlertCircle, FileText, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetChapter } from '../hooks/useQueries';
-import { useActor } from '../hooks/useActor';
 import { isChapterCompleted, toggleChapterCompleted, addRecentlyViewed } from '../utils/storageService';
 import AudioPlayer from '../components/AudioPlayer';
 import QuizSection from '../components/QuizSection';
@@ -16,18 +15,14 @@ import NotesViewer from '../components/NotesViewer';
 export default function ChapterPage() {
   const { chapterId } = useParams({ strict: false }) as { chapterId: string };
   const navigate = useNavigate();
-  const { actor } = useActor();
   const [completed, setCompleted] = useState(false);
 
   // Notes selection
   const [selectedNotesUrl, setSelectedNotesUrl] = useState<string | null>(null);
 
-  // Audio selection & loading
+  // Audio selection — just store the URL string directly
+  const [selectedAudioUrl, setSelectedAudioUrl] = useState<string | null>(null);
   const [selectedAudioSlot, setSelectedAudioSlot] = useState<1 | 2 | null>(null);
-  const [audioObjectUrl, setAudioObjectUrl] = useState<string | null>(null);
-  const [audioLoading, setAudioLoading] = useState(false);
-  const [audioError, setAudioError] = useState<string | null>(null);
-  const objectUrlRef = useRef<string | null>(null);
 
   const { data: chapter, isLoading, isError } = useGetChapter(chapterId ?? null);
 
@@ -37,15 +32,6 @@ export default function ChapterPage() {
       addRecentlyViewed(chapterId);
     }
   }, [chapterId]);
-
-  // Revoke object URLs on unmount
-  useEffect(() => {
-    return () => {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-      }
-    };
-  }, []);
 
   // Auto-select first available notes when chapter loads
   useEffect(() => {
@@ -72,49 +58,11 @@ export default function ChapterPage() {
     }
   };
 
-  const handleSelectAudio = async (slot: 1 | 2) => {
-    if (!actor || !chapterId) return;
+  const handleSelectAudio = (slot: 1 | 2) => {
+    if (!chapter) return;
+    const url = slot === 1 ? chapter.audioUrl1 : chapter.audioUrl2;
     setSelectedAudioSlot(slot);
-    setAudioLoading(true);
-    setAudioError(null);
-
-    // Revoke previous object URL
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(objectUrlRef.current);
-      objectUrlRef.current = null;
-      setAudioObjectUrl(null);
-    }
-
-    try {
-      const data = slot === 1
-        ? await actor.getAudioData(BigInt(chapterId))
-        : await actor.getAudioData2(BigInt(chapterId));
-
-      if (data && data.length > 0) {
-        const mimeType = slot === 1
-          ? (chapter?.audioMimeType || "audio/mpeg")
-          : (chapter?.audioMimeType2 || "audio/mpeg");
-
-        // Copy bytes into a guaranteed plain ArrayBuffer to satisfy Blob constructor types
-        const plainBuffer = new ArrayBuffer(data.byteLength);
-        new Uint8Array(plainBuffer).set(data);
-        const blob = new Blob([plainBuffer], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        objectUrlRef.current = url;
-        setAudioObjectUrl(url);
-      } else {
-        // Fall back to legacy audioUrl for slot 1
-        if (slot === 1 && chapter?.audioUrl) {
-          setAudioObjectUrl(chapter.audioUrl);
-        } else {
-          setAudioError("Audio data not found.");
-        }
-      }
-    } catch {
-      setAudioError("Failed to load audio. Please try again.");
-    } finally {
-      setAudioLoading(false);
-    }
+    setSelectedAudioUrl(url || null);
   };
 
   if (isLoading) {
@@ -151,13 +99,13 @@ export default function ChapterPage() {
   if (url1) notesOptions.push({ url: url1, label: chapter.notesLabel1 || "Notes 1" });
   if (chapter.notesUrl2) notesOptions.push({ url: chapter.notesUrl2, label: chapter.notesLabel2 || "Notes 2" });
 
-  // Build audio options
-  const audioOptions: { slot: 1 | 2; label: string }[] = [];
-  if (chapter.hasAudioBlob || chapter.audioUrl) {
-    audioOptions.push({ slot: 1, label: chapter.audioLabel1 || "Audio 1" });
+  // Build audio options from URL strings
+  const audioOptions: { slot: 1 | 2; label: string; url: string }[] = [];
+  if (chapter.audioUrl1) {
+    audioOptions.push({ slot: 1, label: chapter.audioLabel1 || "Audio 1", url: chapter.audioUrl1 });
   }
-  if (chapter.hasAudioBlob2) {
-    audioOptions.push({ slot: 2, label: chapter.audioLabel2 || "Audio 2" });
+  if (chapter.audioUrl2) {
+    audioOptions.push({ slot: 2, label: chapter.audioLabel2 || "Audio 2", url: chapter.audioUrl2 });
   }
 
   return (
@@ -289,8 +237,7 @@ export default function ChapterPage() {
                     <button
                       key={opt.slot}
                       onClick={() => handleSelectAudio(opt.slot)}
-                      disabled={audioLoading}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all disabled:opacity-60 ${
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
                         selectedAudioSlot === opt.slot
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-card text-foreground border-border hover:border-primary/50 hover:bg-muted"
@@ -302,27 +249,13 @@ export default function ChapterPage() {
                   ))}
                 </div>
 
-                {audioLoading && (
-                  <div className="flex items-center justify-center py-8 gap-3 text-muted-foreground">
-                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm text-foreground/70">Loading audio...</span>
-                  </div>
+                {selectedAudioUrl && (
+                  <AudioPlayer url={selectedAudioUrl} />
                 )}
 
-                {audioError && !audioLoading && (
-                  <div className="flex items-center gap-2 text-destructive py-4">
-                    <AlertCircle className="w-5 h-5 shrink-0" />
-                    <span className="text-sm">{audioError}</span>
-                  </div>
-                )}
-
-                {audioObjectUrl && !audioLoading && !audioError && (
-                  <AudioPlayer url={audioObjectUrl} />
-                )}
-
-                {!selectedAudioSlot && !audioLoading && (
+                {!selectedAudioSlot && (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Select an audio file above to start listening.
+                    Select an audio track above to start listening.
                   </p>
                 )}
               </div>

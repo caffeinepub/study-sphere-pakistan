@@ -24,14 +24,11 @@ export interface Chapter {
   notesLabel2: string;
   audioLabel1: string;
   audioLabel2: string;
-  audioUrl: string;
-  audioMimeType: string;
-  audioMimeType2: string;
+  audioUrl1: string;
+  audioUrl2: string;
   quizQuestions: QuizQuestion[];
   flashcards: FlashcardItem[];
   createdAt: number;
-  hasAudioBlob: boolean;
-  hasAudioBlob2: boolean;
 }
 
 export interface PdfEntry {

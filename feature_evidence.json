@@ -2,8 +2,47 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-frontend-typescript-chapter-interface-in-frontend-src-types-chapter-ts-to-add-the-optional-fields-notesurl1-noteslabel1-notesurl2-noteslabel2-audiolabel1-audiolabel2-audiomimetype2-all-string-or-optional-string-update-chaptermapper-ts-to-map-these-new-backend-fields-to-the-frontend-chapter-type",
-      "featureTitle": "Update the frontend TypeScript Chapter interface in frontend/src/types/chapter.ts to add the optional fields: notesUrl1, notesLabel1, notesUrl2, notesLabel2, audioLabel1, audioLabel2, audioMimeType2 (all string or optional string). Update chapterMapper.ts to map these new backend fields to the frontend Chapter type.",
+      "featureId": "feature-in-frontend-src-components-chapterform-tsx-replace-both-audio-1-and-audio-2-file-upload-inputs-and-their-associated-progress-bars-file-upload-state-and-chunked-upload-logic-with-plain-text-url-input-fields-audio-1-must-have-a-text-input-for-the-audio-url-placeholder-audio-1-url-any-link-youtube-google-drive-direct-etc-and-an-adjacent-optional-label-field-placeholder-audio-1-label-audio-2-must-have-a-text-input-for-the-audio-url-placeholder-audio-2-url-any-link-youtube-google-drive-direct-etc-and-an-adjacent-optional-label-field-placeholder-audio-2-label-remove-all-file-state-variables-chunked-upload-calls-uploadaudiochunk-uploadaudiochunk2-finalizeaudioupload-finalizeaudioupload2-upload-progress-state-and-upload-progress-bar-ui-elements-related-to-audio-the-save-button-flow-must-no-longer-perform-any-audio-upload-steps-chapter-metadata-including-the-two-audio-url-strings-and-their-labels-is-saved-directly-via-createchapter-or-updatechapter-saving-a-chapter-with-only-a-title-must-still-work-all-audio-url-fields-remain-optional",
+      "featureTitle": "In frontend/src/components/ChapterForm.tsx, replace both Audio 1 and Audio 2 file upload inputs (and their associated progress bars, file-upload state, and chunked-upload logic) with plain text URL input fields. Audio 1 must have a text input for the audio URL (placeholder: 'Audio 1 URL — any link (YouTube, Google Drive, direct, etc.)') and an adjacent optional label field (placeholder: 'Audio 1 Label'). Audio 2 must have a text input for the audio URL (placeholder: 'Audio 2 URL — any link (YouTube, Google Drive, direct, etc.)') and an adjacent optional label field (placeholder: 'Audio 2 Label'). Remove all File state variables, chunked-upload calls (uploadAudioChunk, uploadAudioChunk2, finalizeAudioUpload, finalizeAudioUpload2), upload progress state, and upload progress bar UI elements related to audio. The Save button flow must no longer perform any audio upload steps — chapter metadata (including the two audio URL strings and their labels) is saved directly via createChapter or updateChapter. Saving a chapter with only a title must still work; all audio URL fields remain optional.",
+      "files": [
+        "frontend/src/components/ChapterForm.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-65"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-chapter-page-audio-tab-in-frontend-src-pages-chapterpage-tsx-and-the-audioplayer-component-in-frontend-src-components-audioplayer-tsx-to-play-audio-using-the-stored-url-strings-audiourl-audiourl1-or-audiourl2-fields-on-the-chapter-object-directly-without-fetching-binary-data-from-the-canister-when-a-chapter-has-one-or-two-audio-urls-the-audio-tab-must-show-named-buttons-cards-for-each-available-audio-item-using-the-admin-entered-label-audiolabel1-audiolabel2-falling-back-to-audio-1-audio-2-clicking-a-named-button-passes-the-corresponding-url-string-directly-to-the-audioplayer-for-playback-remove-any-calls-to-getaudiodata-or-getaudiodata2-canister-functions-and-remove-any-url-createobjecturl-url-revokeobjecturl-logic-that-was-used-for-binary-audio-blobs-the-audioplayer-must-accept-the-url-as-is-and-attempt-playback-displaying-an-error-message-only-if-the-browser-cannot-load-the-resource-if-no-audio-url-is-stored-for-either-slot-show-the-existing-no-audio-available-empty-state-ui",
+      "featureTitle": "Update the Chapter page Audio tab in frontend/src/pages/ChapterPage.tsx and the AudioPlayer component in frontend/src/components/AudioPlayer.tsx to play audio using the stored URL strings (audioUrl, audioUrl1, or audioUrl2 fields on the Chapter object) directly — without fetching binary data from the canister. When a chapter has one or two audio URLs, the Audio tab must show named buttons/cards for each available audio item using the admin-entered label (audioLabel1 / audioLabel2), falling back to 'Audio 1' / 'Audio 2'. Clicking a named button passes the corresponding URL string directly to the AudioPlayer for playback. Remove any calls to getAudioData or getAudioData2 canister functions, and remove any URL.createObjectURL / URL.revokeObjectURL logic that was used for binary audio blobs. The AudioPlayer must accept the URL as-is and attempt playback, displaying an error message only if the browser cannot load the resource. If no audio URL is stored for either slot, show the existing 'No audio available' empty-state UI.",
+      "files": [
+        "frontend/src/components/AudioPlayer.tsx",
+        "frontend/src/pages/ChapterPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-66"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-frontend-src-utils-chaptermapper-ts-to-map-the-audiourl1-and-audiourl2-backend-fields-to-the-frontend-chapter-type-and-update-frontend-src-types-chapter-ts-to-include-audiourl1-and-audiourl2-as-optional-string-fields-on-the-chapter-interface-remove-any-frontend-references-to-hasaudio-hasaudio2-or-binary-audio-blob-fields-that-were-used-for-the-chunked-upload-feature",
+      "featureTitle": "Update frontend/src/utils/chapterMapper.ts to map the audioUrl1 and audioUrl2 backend fields to the frontend Chapter type, and update frontend/src/types/chapter.ts to include audioUrl1 and audioUrl2 as optional string fields on the Chapter interface. Remove any frontend references to hasAudio, hasAudio2, or binary audio blob fields that were used for the chunked upload feature.",
       "files": [
         "frontend/src/types/chapter.ts",
         "frontend/src/utils/chapterMapper.ts"
@@ -17,84 +56,7 @@
         "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-54"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-admin-panel-s-chapterform-frontend-src-components-chapterform-tsx-to-replace-the-single-notes-url-input-and-single-audio-upload-input-with-two-notes-url-inputs-and-two-audio-file-upload-inputs-each-notes-url-input-must-have-an-adjacent-optional-label-text-field-placeholder-notes-1-label-and-notes-2-label-each-audio-file-upload-input-must-have-an-adjacent-optional-label-text-field-placeholder-audio-1-label-and-audio-2-label-when-editing-a-chapter-that-already-has-audio-stored-for-slot-2-hasaudio2-show-audio-file-uploaded-status-and-allow-uploading-a-replacement-both-audio-uploads-must-show-individual-progress-bars-0-100-during-upload-and-individual-success-error-messages-on-save-for-a-new-chapter-create-the-chapter-first-then-upload-audio-file-1-if-selected-via-uploadaudiofile-then-upload-audio-file-2-if-selected-via-uploadaudiofile2-on-save-for-an-edit-upload-whichever-audio-files-have-been-newly-selected-all-four-fields-both-notes-urls-and-both-audio-files-remain-optional-saving-a-chapter-with-only-a-title-must-still-work",
-      "featureTitle": "Update the Admin Panel's ChapterForm (frontend/src/components/ChapterForm.tsx) to replace the single notes URL input and single audio upload input with two notes URL inputs and two audio file upload inputs. Each notes URL input must have an adjacent optional label text field (placeholder: 'Notes 1 Label' and 'Notes 2 Label'). Each audio file upload input must have an adjacent optional label text field (placeholder: 'Audio 1 Label' and 'Audio 2 Label'). When editing a chapter that already has audio stored for slot 2 (hasAudio2), show 'Audio file uploaded' status and allow uploading a replacement. Both audio uploads must show individual progress bars (0–100%) during upload and individual success/error messages. On Save for a new chapter: create the chapter first, then upload audio file 1 (if selected) via uploadAudioFile, then upload audio file 2 (if selected) via uploadAudioFile2. On Save for an edit: upload whichever audio files have been newly selected. All four fields (both notes URLs and both audio files) remain optional — saving a chapter with only a title must still work.",
-      "files": [
-        "frontend/src/components/ChapterForm.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-56"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-chapter-page-notes-tab-frontend-src-pages-chapterpage-tsx-and-the-notesviewer-component-frontend-src-components-notesviewer-tsx-so-that-when-a-chapter-has-one-or-two-notes-urls-the-notes-tab-shows-named-buttons-cards-for-each-available-notes-link-using-the-admin-entered-label-noteslabel1-noteslabel2-falling-back-to-notes-1-notes-2-if-no-label-is-provided-clicking-a-named-button-opens-or-embeds-that-notes-url-in-the-viewer-if-only-one-notes-url-is-present-show-only-one-button-if-neither-is-present-show-the-existing-empty-state-ui",
-      "featureTitle": "Update the Chapter page Notes tab (frontend/src/pages/ChapterPage.tsx) and the NotesViewer component (frontend/src/components/NotesViewer.tsx) so that when a chapter has one or two notes URLs, the Notes tab shows named buttons/cards for each available notes link using the admin-entered label (notesLabel1 / notesLabel2), falling back to 'Notes 1' / 'Notes 2' if no label is provided. Clicking a named button opens or embeds that notes URL in the viewer. If only one notes URL is present, show only one button. If neither is present, show the existing empty-state UI.",
-      "files": [
-        "frontend/src/pages/ChapterPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-57"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-chapter-page-audio-tab-frontend-src-pages-chapterpage-tsx-and-the-audioplayer-component-frontend-src-components-audioplayer-tsx-so-that-when-a-chapter-has-one-or-two-audio-files-stored-in-the-canister-the-audio-tab-shows-named-buttons-cards-for-each-available-audio-item-using-the-admin-entered-label-audiolabel1-audiolabel2-falling-back-to-audio-1-audio-2-clicking-a-named-button-fetches-the-corresponding-audio-binary-from-the-canister-getaudiodata-for-slot-1-getaudiodata2-for-slot-2-converts-it-to-an-object-url-via-url-createobjecturl-and-passes-it-to-the-audioplayer-for-playback-revoke-the-object-url-on-component-unmount-if-neither-audio-slot-has-data-but-a-legacy-audiourl-string-exists-fall-back-to-audiourl-if-no-audio-is-available-at-all-show-the-existing-no-audio-available-ui",
-      "featureTitle": "Update the Chapter page Audio tab (frontend/src/pages/ChapterPage.tsx) and the AudioPlayer component (frontend/src/components/AudioPlayer.tsx) so that when a chapter has one or two audio files stored in the canister, the Audio tab shows named buttons/cards for each available audio item using the admin-entered label (audioLabel1 / audioLabel2), falling back to 'Audio 1' / 'Audio 2'. Clicking a named button fetches the corresponding audio binary from the canister (getAudioData for slot 1, getAudioData2 for slot 2), converts it to an object URL via URL.createObjectURL, and passes it to the AudioPlayer for playback. Revoke the object URL on component unmount. If neither audio slot has data but a legacy audioUrl string exists, fall back to audioUrl. If no audio is available at all, show the existing 'No audio available' UI.",
-      "files": [
-        "frontend/src/pages/ChapterPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-58"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-perform-a-full-color-contrast-audit-and-fix-across-all-frontend-components-and-pages-in-both-light-and-dark-mode-every-text-element-must-have-sufficient-contrast-against-its-background-specifically-fix-button-labels-on-gradient-colored-backgrounds-card-text-on-colored-card-backgrounds-tab-labels-active-and-inactive-in-both-modes-form-input-labels-and-placeholder-text-flashcard-front-back-text-quiz-option-text-and-selected-state-text-chapter-list-item-text-admin-panel-form-fields-and-section-headers-recently-viewed-section-text-empty-state-messages-progress-indicators-and-any-other-element-where-text-color-matches-or-is-too-close-to-the-background-color-use-tailwind-s-dark-variant-classes-and-ensure-all-fixes-apply-correctly-when-the-dark-class-is-present-on-the-document-root",
-      "featureTitle": "Perform a full color contrast audit and fix across all frontend components and pages in both light and dark mode. Every text element must have sufficient contrast against its background. Specifically fix: button labels on gradient/colored backgrounds, card text on colored card backgrounds, tab labels (active and inactive) in both modes, form input labels and placeholder text, flashcard front/back text, quiz option text and selected-state text, chapter list item text, admin panel form fields and section headers, recently viewed section text, empty-state messages, progress indicators, and any other element where text color matches or is too close to the background color. Use Tailwind's dark: variant classes and ensure all fixes apply correctly when the 'dark' class is present on the document root.",
-      "files": [
-        "frontend/src/components/ChapterForm.tsx",
-        "frontend/src/pages/ChapterPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-60"
+        "REQ-68"
       ],
       "confidence": "high"
     }
