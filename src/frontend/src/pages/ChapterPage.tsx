@@ -11,6 +11,7 @@ import {
   Circle,
   FileText,
   Headphones,
+  Heart,
   HelpCircle,
   Layers,
   Music,
@@ -26,13 +27,16 @@ import { useGetChapter } from "../hooks/useQueries";
 import {
   addRecentlyViewed,
   isChapterCompleted,
+  isChapterFavorite,
   toggleChapterCompleted,
+  toggleChapterFavorite,
 } from "../utils/storageService";
 
 export default function ChapterPage() {
   const { chapterId } = useParams({ strict: false }) as { chapterId: string };
   const navigate = useNavigate();
   const [completed, setCompleted] = useState(false);
+  const [favorite, setFavorite] = useState(false);
 
   // Notes selection
   const [selectedNotesUrl, setSelectedNotesUrl] = useState<string | null>(null);
@@ -52,7 +56,9 @@ export default function ChapterPage() {
   useEffect(() => {
     if (chapterId) {
       setCompleted(isChapterCompleted(chapterId));
+      setFavorite(isChapterFavorite(chapterId));
       addRecentlyViewed(chapterId);
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
   }, [chapterId]);
 
@@ -76,6 +82,12 @@ export default function ChapterPage() {
     if (!chapterId) return;
     const nowCompleted = toggleChapterCompleted(chapterId);
     setCompleted(nowCompleted);
+  };
+
+  const handleToggleFavorite = () => {
+    if (!chapterId) return;
+    const nowFavorite = toggleChapterFavorite(chapterId);
+    setFavorite(nowFavorite);
   };
 
   const handleBack = () => {
@@ -177,6 +189,18 @@ export default function ChapterPage() {
           <Button
             variant="ghost"
             size="icon"
+            onClick={handleToggleFavorite}
+            title={favorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart
+              className={`w-5 h-5 transition-colors ${
+                favorite ? "text-red-500 fill-red-500" : "text-muted-foreground"
+              }`}
+            />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleToggleCompleted}
             title={completed ? "Mark as incomplete" : "Mark as completed"}
           >
@@ -190,11 +214,14 @@ export default function ChapterPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6">
-        <Tabs defaultValue="notes">
-          <TabsList className="w-full mb-6 bg-muted">
+        <Tabs
+          defaultValue="notes"
+          onValueChange={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          <TabsList className="w-full mb-6 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <TabsTrigger
               value="notes"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
               data-ocid="chapter.notes.tab"
             >
               <BookOpen className="w-4 h-4" />
@@ -202,7 +229,7 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="audio"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
               data-ocid="chapter.audio.tab"
             >
               <Headphones className="w-4 h-4" />
@@ -210,39 +237,48 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="quiz"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
               data-ocid="chapter.quiz.tab"
             >
               <HelpCircle className="w-4 h-4" />
               <span className="hidden sm:inline">Quiz</span>
               {chapter.quizQuestions.length > 0 && (
-                <Badge variant="secondary" className="ml-1 text-xs px-1">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300 data-[state=active]:text-white"
+                >
                   {chapter.quizQuestions.length}
                 </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger
               value="truefalse"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
               data-ocid="chapter.truefalse.tab"
             >
               <ToggleLeft className="w-4 h-4" />
               <span className="hidden sm:inline">T/F</span>
               {chapter.trueFalseQuestions.length > 0 && (
-                <Badge variant="secondary" className="ml-1 text-xs px-1">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300"
+                >
                   {chapter.trueFalseQuestions.length}
                 </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger
               value="flashcards"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
               data-ocid="chapter.flashcards.tab"
             >
               <Layers className="w-4 h-4" />
               <span className="hidden sm:inline">Cards</span>
               {chapter.flashcards.length > 0 && (
-                <Badge variant="secondary" className="ml-1 text-xs px-1">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300"
+                >
                   {chapter.flashcards.length}
                 </Badge>
               )}

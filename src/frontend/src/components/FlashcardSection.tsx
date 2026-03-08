@@ -45,13 +45,13 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
     setIsFlipped(false);
     setTimeout(
       () => setCurrentIndex((i) => Math.min(i + 1, cards.length - 1)),
-      150,
+      300,
     );
   };
 
   const goPrev = () => {
     setIsFlipped(false);
-    setTimeout(() => setCurrentIndex((i) => Math.max(i - 1, 0)), 150);
+    setTimeout(() => setCurrentIndex((i) => Math.max(i - 1, 0)), 300);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -103,62 +103,148 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
         </div>
       </div>
 
-      {/* Card */}
-      <button
-        type="button"
-        className="flashcard-container w-full max-w-2xl cursor-pointer text-left"
-        style={{ height: "280px" }}
-        onClick={() => setIsFlipped(!isFlipped)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        aria-label={isFlipped ? "Show question" : "Reveal answer"}
+      {/* Card — perspective wrapper is a plain div; inner button handles interaction */}
+      <div
+        className="w-full max-w-2xl"
+        style={{ perspective: "1200px", height: "280px" }}
       >
-        <div className={`flashcard-inner ${isFlipped ? "flipped" : ""}`}>
-          {/* Front */}
-          <div className="flashcard-face flashcard-front shadow-lg">
-            <span
-              className="text-xs font-semibold uppercase tracking-widest mb-4 opacity-80"
-              style={{ color: "var(--flashcard-front-text)" }}
+        <button
+          type="button"
+          className="w-full h-full cursor-pointer"
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+          }}
+          onClick={() => setIsFlipped((f) => !f)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          aria-label={isFlipped ? "Show question" : "Reveal answer"}
+          data-ocid="flashcard.card"
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              transformStyle: "preserve-3d",
+              transition: "transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1)",
+              transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+            }}
+          >
+            {/* Front face */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+                borderRadius: "16px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2rem",
+                backgroundColor: "var(--flashcard-front-bg)",
+                color: "var(--flashcard-front-text)",
+                boxShadow:
+                  "0 10px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)",
+              }}
             >
-              Question
-            </span>
-            <p
-              className="text-xl font-heading font-semibold text-center leading-relaxed"
-              style={{ color: "var(--flashcard-front-text)" }}
-            >
-              {card.front}
-            </p>
-            <span
-              className="text-xs mt-4 opacity-60"
-              style={{ color: "var(--flashcard-front-text)" }}
-            >
-              Tap to reveal answer
-            </span>
-          </div>
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  marginBottom: "1rem",
+                  opacity: 0.85,
+                  color: "var(--flashcard-front-text)",
+                }}
+              >
+                Question
+              </span>
+              <p
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: 600,
+                  textAlign: "center",
+                  lineHeight: 1.55,
+                  color: "var(--flashcard-front-text)",
+                }}
+              >
+                {card.front}
+              </p>
+              <span
+                style={{
+                  fontSize: "0.72rem",
+                  marginTop: "1rem",
+                  opacity: 0.6,
+                  color: "var(--flashcard-front-text)",
+                }}
+              >
+                Tap to reveal answer
+              </span>
+            </div>
 
-          {/* Back */}
-          <div className="flashcard-face flashcard-back shadow-lg">
-            <span
-              className="text-xs font-semibold uppercase tracking-widest mb-4 opacity-80"
-              style={{ color: "var(--flashcard-back-text)" }}
+            {/* Back face */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+                transform: "rotateY(180deg)",
+                borderRadius: "16px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2rem",
+                backgroundColor: "var(--flashcard-back-bg)",
+                color: "var(--flashcard-back-text)",
+                boxShadow:
+                  "0 10px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)",
+              }}
             >
-              Answer
-            </span>
-            <p
-              className="text-xl font-heading font-semibold text-center leading-relaxed"
-              style={{ color: "var(--flashcard-back-text)" }}
-            >
-              {card.back}
-            </p>
-            <span
-              className="text-xs mt-4 opacity-60"
-              style={{ color: "var(--flashcard-back-text)" }}
-            >
-              Tap to see question
-            </span>
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  marginBottom: "1rem",
+                  opacity: 0.85,
+                  color: "var(--flashcard-back-text)",
+                }}
+              >
+                Answer
+              </span>
+              <p
+                style={{
+                  fontSize: "1.2rem",
+                  fontWeight: 600,
+                  textAlign: "center",
+                  lineHeight: 1.55,
+                  color: "var(--flashcard-back-text)",
+                }}
+              >
+                {card.back}
+              </p>
+              <span
+                style={{
+                  fontSize: "0.72rem",
+                  marginTop: "1rem",
+                  opacity: 0.6,
+                  color: "var(--flashcard-back-text)",
+                }}
+              >
+                Tap to see question
+              </span>
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
+      </div>
 
       {/* Navigation */}
       <div className="flex items-center gap-4">
@@ -179,7 +265,8 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
               // biome-ignore lint/suspicious/noArrayIndexKey: dot indicators are positional
               key={i}
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setIsFlipped(false);
                 setCurrentIndex(i);
               }}

@@ -1,9 +1,10 @@
 // storageService.ts
-// Only manages device-local user data: recently viewed, completed chapters, dark mode.
+// Only manages device-local user data: recently viewed, completed chapters, favorites, dark mode.
 // Chapter and PDF entry CRUD is now handled by the canister backend via useQueries.ts.
 
 const RECENTLY_VIEWED_KEY = "recentlyViewed";
 const COMPLETED_KEY = "completedChapters";
+const FAVORITES_KEY = "favoriteChapters";
 const DARK_MODE_KEY = "darkMode";
 
 // ─── Recently Viewed ──────────────────────────────────────────────────────────
@@ -52,6 +53,36 @@ export function toggleChapterCompleted(chapterId: string): boolean {
   }
   localStorage.setItem(COMPLETED_KEY, JSON.stringify(updated));
   return nowCompleted;
+}
+
+// ─── Favorite Chapters ────────────────────────────────────────────────────────
+
+export function getFavoriteChapters(): string[] {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function isChapterFavorite(chapterId: string): boolean {
+  return getFavoriteChapters().includes(chapterId);
+}
+
+export function toggleChapterFavorite(chapterId: string): boolean {
+  const current = getFavoriteChapters();
+  let updated: string[];
+  let nowFavorite: boolean;
+  if (current.includes(chapterId)) {
+    updated = current.filter((id) => id !== chapterId);
+    nowFavorite = false;
+  } else {
+    updated = [chapterId, ...current];
+    nowFavorite = true;
+  }
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+  return nowFavorite;
 }
 
 // ─── Dark Mode ────────────────────────────────────────────────────────────────

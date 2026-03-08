@@ -4,10 +4,13 @@ import {
   Clock,
   FlaskConical,
   GraduationCap,
+  Headphones,
+  Heart,
   Microscope,
   Search,
   Shield,
   Star,
+  ToggleLeft,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
@@ -58,44 +61,58 @@ export default function HomePage() {
     {
       icon: BookOpen,
       title: "Comprehensive Notes",
-      desc: "Detailed PDF notes for every chapter",
-      color: "text-blue-500 dark:text-blue-400",
+      desc: "Embedded Google Drive notes for every chapter — view directly in the app",
+      color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-50 dark:bg-blue-900/20",
+    },
+    {
+      icon: Headphones,
+      title: "Audio Lectures",
+      desc: "Listen to chapter audio — YouTube, Google Drive, SoundCloud, and more",
+      color: "text-teal-600 dark:text-teal-400",
+      bg: "bg-teal-50 dark:bg-teal-900/20",
     },
     {
       icon: Zap,
       title: "Interactive Quizzes",
-      desc: "Test your knowledge with MCQs",
-      color: "text-yellow-500 dark:text-yellow-400",
+      desc: "MCQ quizzes with instant feedback, explanations and score tracking",
+      color: "text-yellow-600 dark:text-yellow-400",
       bg: "bg-yellow-50 dark:bg-yellow-900/20",
     },
     {
       icon: FlaskConical,
       title: "Flashcards",
-      desc: "Quick revision with flip cards",
-      color: "text-purple-500 dark:text-purple-400",
+      desc: "3D flip cards for quick revision — swipe or click to reveal answers",
+      color: "text-purple-600 dark:text-purple-400",
       bg: "bg-purple-50 dark:bg-purple-900/20",
     },
     {
-      icon: Star,
+      icon: ToggleLeft,
+      title: "True / False",
+      desc: "Quick true/false practice with results and skip support",
+      color: "text-indigo-600 dark:text-indigo-400",
+      bg: "bg-indigo-50 dark:bg-indigo-900/20",
+    },
+    {
+      icon: Heart,
       title: "Favorites",
-      desc: "Save chapters for quick access",
-      color: "text-orange-500 dark:text-orange-400",
-      bg: "bg-orange-50 dark:bg-orange-900/20",
+      desc: "Save your favorite chapters for fast access any time",
+      color: "text-red-600 dark:text-red-400",
+      bg: "bg-red-50 dark:bg-red-900/20",
     },
     {
       icon: Clock,
       title: "Recent History",
-      desc: "Pick up where you left off",
-      color: "text-green-500 dark:text-green-400",
+      desc: "Pick up exactly where you left off with your viewing history",
+      color: "text-green-600 dark:text-green-400",
       bg: "bg-green-50 dark:bg-green-900/20",
     },
     {
       icon: Shield,
       title: "Free Forever",
-      desc: "All content completely free",
-      color: "text-red-500 dark:text-red-400",
-      bg: "bg-red-50 dark:bg-red-900/20",
+      desc: "All study materials completely free for every student",
+      color: "text-orange-600 dark:text-orange-400",
+      bg: "bg-orange-50 dark:bg-orange-900/20",
     },
   ];
 
@@ -188,7 +205,7 @@ export default function HomePage() {
             Comprehensive tools designed for Pakistani Matric, FSc and MDCAT
             students
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature) => (
               <div
                 key={feature.title}

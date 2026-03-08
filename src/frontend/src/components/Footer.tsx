@@ -28,6 +28,8 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               {[
+                { label: "Class 9", path: "/class/9" },
+                { label: "Class 10", path: "/class/10" },
                 { label: "Class 11", path: "/class/11" },
                 { label: "Class 12", path: "/class/12" },
                 { label: "MDCAT Prep", path: "/mdcat" },
