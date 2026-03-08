@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: oklch(0.98 0.005 240);
+    --foreground: oklch(0.15 0.02 240);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.15 0.02 240);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.15 0.02 240);
+    --primary: oklch(0.45 0.18 250);
+    --primary-foreground: oklch(0.98 0.005 240);
+    --secondary: oklch(0.92 0.02 240);
+    --secondary-foreground: oklch(0.25 0.05 240);
+    --muted: oklch(0.94 0.01 240);
+    --muted-foreground: oklch(0.5 0.03 240);
+    --accent: oklch(0.88 0.06 200);
+    --accent-foreground: oklch(0.2 0.05 240);
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.98 0.005 240);
+    --border: oklch(0.88 0.01 240);
+    --input: oklch(0.88 0.01 240);
+    --ring: oklch(0.45 0.18 250);
+    --success: oklch(0.55 0.18 145);
+    --success-foreground: oklch(0.98 0.005 240);
+    --warning: oklch(0.7 0.18 75);
+    --warning-foreground: oklch(0.15 0.02 240);
+    --radius: 0.5rem;
+
+    /* Flashcard specific */
+    --flashcard-front-bg: oklch(0.45 0.18 250);
+    --flashcard-front-text: oklch(0.98 0.005 240);
+    --flashcard-back-bg: oklch(0.55 0.18 145);
+    --flashcard-back-text: oklch(0.98 0.005 240);
+  }
+
+  .dark {
+    --background: oklch(0.13 0.02 240);
+    --foreground: oklch(0.93 0.01 240);
+    --card: oklch(0.18 0.025 240);
+    --card-foreground: oklch(0.93 0.01 240);
+    --popover: oklch(0.18 0.025 240);
+    --popover-foreground: oklch(0.93 0.01 240);
+    --primary: oklch(0.6 0.18 250);
+    --primary-foreground: oklch(0.1 0.02 240);
+    --secondary: oklch(0.25 0.03 240);
+    --secondary-foreground: oklch(0.9 0.01 240);
+    --muted: oklch(0.22 0.025 240);
+    --muted-foreground: oklch(0.65 0.03 240);
+    --accent: oklch(0.3 0.06 200);
+    --accent-foreground: oklch(0.9 0.01 240);
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.98 0.005 240);
+    --border: oklch(0.28 0.025 240);
+    --input: oklch(0.28 0.025 240);
+    --ring: oklch(0.6 0.18 250);
+    --success: oklch(0.55 0.18 145);
+    --success-foreground: oklch(0.98 0.005 240);
+    --warning: oklch(0.7 0.18 75);
+    --warning-foreground: oklch(0.15 0.02 240);
+
+    /* Flashcard specific */
+    --flashcard-front-bg: oklch(0.35 0.18 250);
+    --flashcard-front-text: oklch(0.95 0.01 240);
+    --flashcard-back-bg: oklch(0.35 0.18 145);
+    --flashcard-back-text: oklch(0.95 0.01 240);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+/* Flashcard flip animation */
+.flashcard-container {
+  perspective: 1000px;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.flashcard-front {
+  background-color: var(--flashcard-front-bg);
+  color: var(--flashcard-front-text);
+}
+
+.flashcard-back {
+  background-color: var(--flashcard-back-bg);
+  color: var(--flashcard-back-text);
+  transform: rotateY(180deg);
+}
+
+/* Smooth transitions */
+.transition-theme {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s
+    ease;
+}
