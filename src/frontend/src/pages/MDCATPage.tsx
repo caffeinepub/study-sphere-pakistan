@@ -24,7 +24,7 @@ import {
   Loader2,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDeletePdfEntry, useGetAllPdfEntries } from "../hooks/useQueries";
 import type { PdfEntry } from "../types/chapter";
 
@@ -63,6 +63,10 @@ const subjects = [
 
 export default function MDCATPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   const { data: pdfData, isLoading, isError } = useGetAllPdfEntries();
   const deletePdfMutation = useDeletePdfEntry();
@@ -109,7 +113,10 @@ export default function MDCATPage() {
               <button
                 key={s.path}
                 type="button"
-                onClick={() => navigate({ to: s.path })}
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "instant" });
+                  navigate({ to: s.path });
+                }}
                 className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-accent/30 transition-all"
               >
                 <s.icon className={`w-6 h-6 ${s.color}`} />

@@ -71,12 +71,12 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       {/* Counter + Jump */}
-      <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-300">
         <span>
           Card {currentIndex + 1} of {cards.length} &bull; Tap card to flip
         </span>
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             Jump:
           </span>
           <Input

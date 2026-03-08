@@ -6,6 +6,7 @@ import {
   Microscope,
   Zap,
 } from "lucide-react";
+import { useEffect } from "react";
 
 const subjects = [
   {
@@ -42,14 +43,25 @@ export default function ClassPage() {
   const navigate = useNavigate();
   const { classNum } = useParams({ from: "/class/$classNum" });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to top when page params change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classNum]);
+
   return (
     <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-blue-900/30 text-primary dark:text-blue-400 text-sm font-medium mb-4">
-            FSc Part{" "}
-            {classNum === "11" ? "1" : classNum === "12" ? "2" : classNum}
+            {classNum === "9"
+              ? "Matric Part 1"
+              : classNum === "10"
+                ? "Matric Part 2"
+                : classNum === "11"
+                  ? "FSc Part 1"
+                  : "FSc Part 2"}
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 dark:text-white mb-3">
             Class {classNum} Subjects
@@ -65,12 +77,13 @@ export default function ClassPage() {
             <button
               key={subject.id}
               type="button"
-              onClick={() =>
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
                 navigate({
                   to: "/class/$classNum/$subject",
                   params: { classNum, subject: subject.id },
-                })
-              }
+                });
+              }}
               className="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-blue-500 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all duration-200 text-left group"
             >
               <div

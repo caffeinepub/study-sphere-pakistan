@@ -195,7 +195,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
     >
       {/* Progress + Jump */}
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
           <span>
             Question {currentIndex + 1} of {questions.length}
           </span>
@@ -208,7 +208,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
             </span>
             {/* Jump control */}
             <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 Jump:
               </span>
               <Input

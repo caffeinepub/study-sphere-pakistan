@@ -173,6 +173,7 @@ export default function HomePage() {
                 key={btn.label}
                 type="button"
                 onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "instant" });
                   if ("path" in btn && btn.path) {
                     navigate({ to: btn.path as "/" });
                   } else if ("classNum" in btn && btn.classNum) {
@@ -240,43 +241,59 @@ export default function HomePage() {
           <div className="flex flex-wrap justify-center gap-4">
             <button
               type="button"
-              onClick={() =>
-                navigate({ to: "/class/$classNum", params: { classNum: "9" } })
-              }
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                navigate({ to: "/class/$classNum", params: { classNum: "9" } });
+              }}
               className="px-8 py-3 rounded-xl bg-white/20 text-white font-semibold hover:bg-white/30 transition-colors border border-white/30"
             >
               Class 9
             </button>
             <button
               type="button"
-              onClick={() =>
-                navigate({ to: "/class/$classNum", params: { classNum: "10" } })
-              }
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                navigate({
+                  to: "/class/$classNum",
+                  params: { classNum: "10" },
+                });
+              }}
               className="px-8 py-3 rounded-xl bg-white/20 text-white font-semibold hover:bg-white/30 transition-colors border border-white/30"
             >
               Class 10
             </button>
             <button
               type="button"
-              onClick={() =>
-                navigate({ to: "/class/$classNum", params: { classNum: "11" } })
-              }
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                navigate({
+                  to: "/class/$classNum",
+                  params: { classNum: "11" },
+                });
+              }}
               className="px-8 py-3 rounded-xl bg-white text-primary dark:text-blue-700 font-semibold hover:bg-gray-100 transition-colors shadow-md"
             >
               Class 11
             </button>
             <button
               type="button"
-              onClick={() =>
-                navigate({ to: "/class/$classNum", params: { classNum: "12" } })
-              }
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                navigate({
+                  to: "/class/$classNum",
+                  params: { classNum: "12" },
+                });
+              }}
               className="px-8 py-3 rounded-xl bg-white/20 text-white font-semibold hover:bg-white/30 transition-colors border border-white/30"
             >
               Class 12
             </button>
             <button
               type="button"
-              onClick={() => navigate({ to: "/mdcat" })}
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                navigate({ to: "/mdcat" });
+              }}
               className="px-8 py-3 rounded-xl bg-white/20 text-white font-semibold hover:bg-white/30 transition-colors border border-white/30"
             >
               MDCAT

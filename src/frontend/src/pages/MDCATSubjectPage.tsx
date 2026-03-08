@@ -25,9 +25,12 @@ export default function MDCATSubjectPage() {
 
   const { data: chapters, isLoading, isError } = useGetAllChapters();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to top when page params change
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
     setRecentIds(getRecentlyViewed());
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject]);
 
   const subjectChapters = (chapters ?? []).filter(
     (ch) =>
@@ -46,6 +49,7 @@ export default function MDCATSubjectPage() {
   const handleChapterClick = (chapter: Chapter) => {
     addRecentlyViewed(chapter.id);
     setRecentIds(getRecentlyViewed());
+    window.scrollTo({ top: 0, behavior: "instant" });
     navigate({ to: `/chapter/${chapter.id}` });
   };
 
@@ -96,7 +100,7 @@ export default function MDCATSubjectPage() {
                   key={ch.id}
                   type="button"
                   onClick={() => handleChapterClick(ch)}
-                  className="w-full text-left px-4 py-3 rounded-lg bg-accent/40 hover:bg-accent transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3 rounded-lg bg-accent/40 hover:bg-accent dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors flex items-center gap-3"
                 >
                   <BookOpen className="w-4 h-4 text-primary shrink-0" />
                   <span className="text-sm font-medium text-foreground">

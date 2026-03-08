@@ -216,12 +216,12 @@ export default function ChapterPage() {
       <main className="max-w-3xl mx-auto px-4 py-6">
         <Tabs
           defaultValue="notes"
-          onValueChange={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onValueChange={() => window.scrollTo({ top: 0, behavior: "instant" })}
         >
           <TabsList className="w-full mb-6 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <TabsTrigger
               value="notes"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-300 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-white transition-colors"
               data-ocid="chapter.notes.tab"
             >
               <BookOpen className="w-4 h-4" />
@@ -229,7 +229,7 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="audio"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-300 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-white transition-colors"
               data-ocid="chapter.audio.tab"
             >
               <Headphones className="w-4 h-4" />
@@ -237,7 +237,7 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="quiz"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-300 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-white transition-colors"
               data-ocid="chapter.quiz.tab"
             >
               <HelpCircle className="w-4 h-4" />
@@ -245,7 +245,7 @@ export default function ChapterPage() {
               {chapter.quizQuestions.length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300 data-[state=active]:text-white"
+                  className="ml-1 text-xs px-1 bg-primary/10 dark:bg-white/20 text-primary dark:text-white"
                 >
                   {chapter.quizQuestions.length}
                 </Badge>
@@ -253,7 +253,7 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="truefalse"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-300 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-white transition-colors"
               data-ocid="chapter.truefalse.tab"
             >
               <ToggleLeft className="w-4 h-4" />
@@ -261,7 +261,7 @@ export default function ChapterPage() {
               {chapter.trueFalseQuestions.length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300"
+                  className="ml-1 text-xs px-1 bg-primary/10 dark:bg-white/20 text-primary dark:text-white"
                 >
                   {chapter.trueFalseQuestions.length}
                 </Badge>
@@ -269,7 +269,7 @@ export default function ChapterPage() {
             </TabsTrigger>
             <TabsTrigger
               value="flashcards"
-              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-400 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-gray-200 transition-colors"
+              className="flex-1 flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-600 dark:text-gray-300 data-[state=inactive]:hover:text-gray-900 dark:data-[state=inactive]:hover:text-white transition-colors"
               data-ocid="chapter.flashcards.tab"
             >
               <Layers className="w-4 h-4" />
@@ -277,7 +277,7 @@ export default function ChapterPage() {
               {chapter.flashcards.length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-1 text-xs px-1 bg-white/20 dark:bg-white/10 text-gray-700 dark:text-gray-300"
+                  className="ml-1 text-xs px-1 bg-primary/10 dark:bg-white/20 text-primary dark:text-white"
                 >
                   {chapter.flashcards.length}
                 </Badge>

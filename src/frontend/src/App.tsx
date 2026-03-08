@@ -5,8 +5,9 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  useRouterState,
 } from "@tanstack/react-router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import SplashScreen from "./components/SplashScreen";
@@ -69,10 +70,26 @@ function DarkModeProvider({ children }: { children: React.ReactNode }) {
 
 const queryClient = new QueryClient();
 
+// Scroll to top on every route change
+function ScrollToTop() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const prevPathRef = useRef(pathname);
+
+  useEffect(() => {
+    if (prevPathRef.current !== pathname) {
+      prevPathRef.current = pathname;
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [pathname]);
+
+  return null;
+}
+
 // Layout component
 function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
+      <ScrollToTop />
       <Header />
       <main className="flex-1 bg-background">
         <Outlet />
@@ -153,7 +170,10 @@ const routeTree = rootRoute.addChildren([
   supportRoute,
 ]);
 
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  scrollRestoration: false,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {

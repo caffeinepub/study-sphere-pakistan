@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,10 +33,13 @@ export default function SubjectPage() {
 
   const { data: chapters, isLoading, isError } = useGetAllChapters();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to top when page params change
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
     setRecentIds(getRecentlyViewed());
     setFavoriteIds(getFavoriteChapters());
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classNum, subject]);
 
   const subjectChapters = (chapters ?? []).filter(
     (ch) =>
@@ -60,7 +62,7 @@ export default function SubjectPage() {
   const handleChapterClick = (chapter: Chapter) => {
     addRecentlyViewed(chapter.id);
     setRecentIds(getRecentlyViewed());
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
     navigate({ to: `/chapter/${chapter.id}` });
   };
 
@@ -203,40 +205,6 @@ export default function SubjectPage() {
                     <span className="font-medium text-foreground truncate">
                       {ch.title}
                     </span>
-                    <div className="ml-auto flex gap-1 shrink-0">
-                      {(ch.notesUrl || ch.notesUrl1) && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-0"
-                        >
-                          Notes
-                        </Badge>
-                      )}
-                      {ch.audioUrl1 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-0"
-                        >
-                          Audio
-                        </Badge>
-                      )}
-                      {ch.quizQuestions.length > 0 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border-0"
-                        >
-                          Quiz
-                        </Badge>
-                      )}
-                      {ch.flashcards.length > 0 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border-0"
-                        >
-                          Cards
-                        </Badge>
-                      )}
-                    </div>
                   </button>
                   <button
                     type="button"
