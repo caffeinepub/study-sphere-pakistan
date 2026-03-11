@@ -1,5 +1,4 @@
-// Canonical frontend types for chapters and PDF entries.
-// These mirror the backend Motoko types but use string IDs for convenience in the UI.
+// Canonical frontend types for chapters, topics and PDF entries.
 
 export interface QuizQuestion {
   question: string;
@@ -23,15 +22,21 @@ export interface Chapter {
   title: string;
   classNumber: string;
   subject: string;
-  notesUrl: string;
+  createdAt: number;
+}
+
+export interface Topic {
+  id: string;
+  chapterId: string;
+  title: string;
   notesUrl1: string;
   notesLabel1: string;
   notesUrl2: string;
   notesLabel2: string;
-  audioLabel1: string;
-  audioLabel2: string;
   audioUrl1: string;
+  audioLabel1: string;
   audioUrl2: string;
+  audioLabel2: string;
   quizQuestions: QuizQuestion[];
   flashcards: FlashcardItem[];
   trueFalseQuestions: TrueFalseQuestion[];

@@ -71,12 +71,12 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       {/* Counter + Jump */}
-      <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+      <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-200">
         <span>
           Card {currentIndex + 1} of {cards.length} &bull; Tap card to flip
         </span>
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-gray-500 dark:text-gray-300">
             Jump:
           </span>
           <Input
@@ -253,7 +253,7 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
           size="icon"
           onClick={goPrev}
           disabled={currentIndex === 0}
-          className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+          className="dark:border-gray-500 dark:text-gray-100 dark:hover:bg-gray-600"
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
@@ -273,7 +273,7 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
               className={`h-1.5 rounded-full transition-all duration-200 ${
                 i === currentIndex
                   ? "bg-primary dark:bg-blue-400 w-5"
-                  : "bg-gray-300 dark:bg-gray-600 w-1.5"
+                  : "bg-gray-300 dark:bg-gray-500 w-1.5"
               }`}
             />
           ))}
@@ -284,7 +284,7 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
           size="icon"
           onClick={goNext}
           disabled={currentIndex === cards.length - 1}
-          className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+          className="dark:border-gray-500 dark:text-gray-100 dark:hover:bg-gray-600"
         >
           <ChevronRight className="w-5 h-5" />
         </Button>
@@ -297,7 +297,7 @@ export default function FlashcardSection({ cards }: FlashcardSectionProps) {
           setCurrentIndex(0);
           setIsFlipped(false);
         }}
-        className="gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+        className="gap-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
       >
         <RotateCcw className="w-3.5 h-3.5" />
         Restart

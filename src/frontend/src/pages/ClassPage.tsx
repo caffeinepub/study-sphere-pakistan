@@ -54,7 +54,7 @@ export default function ClassPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-blue-900/30 text-primary dark:text-blue-400 text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-blue-800/40 text-primary dark:text-blue-300 text-sm font-medium mb-4">
             {classNum === "9"
               ? "Matric Part 1"
               : classNum === "10"
@@ -84,7 +84,7 @@ export default function ClassPage() {
                   params: { classNum, subject: subject.id },
                 });
               }}
-              className="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-blue-500 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all duration-200 text-left group"
+              className="flex items-center gap-4 p-6 bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 hover:border-primary dark:hover:border-blue-400 hover:shadow-md dark:hover:shadow-black/30 transition-all duration-200 text-left group"
             >
               <div
                 className={`w-14 h-14 rounded-xl ${subject.color} flex items-center justify-center flex-shrink-0 shadow-md`}

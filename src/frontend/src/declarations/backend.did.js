@@ -19,52 +19,50 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
-export const ChapterInput = IDL.Record({
+export const TopicInput = IDL.Record({
   'title' : IDL.Text,
   'notesLabel1' : IDL.Text,
   'notesLabel2' : IDL.Text,
   'audioLabel1' : IDL.Text,
   'audioLabel2' : IDL.Text,
-  'classNumber' : IDL.Text,
   'notesUrl1' : IDL.Text,
   'notesUrl2' : IDL.Text,
-  'subject' : IDL.Text,
+  'chapterId' : IDL.Nat,
   'audioUrl1' : IDL.Text,
   'audioUrl2' : IDL.Text,
-  'notesUrl' : IDL.Text,
   'quizQuestions' : IDL.Text,
   'flashcards' : IDL.Text,
   'trueFalseQuestions' : IDL.Text,
-});
-export const PdfEntryInput = IDL.Record({
-  'url' : IDL.Text,
-  'title' : IDL.Text,
-  'entryType' : IDL.Text,
 });
 export const Chapter = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
-  'notesLabel1' : IDL.Text,
-  'notesLabel2' : IDL.Text,
-  'audioLabel1' : IDL.Text,
-  'audioLabel2' : IDL.Text,
   'classNumber' : IDL.Text,
-  'notesUrl1' : IDL.Text,
-  'notesUrl2' : IDL.Text,
   'subject' : IDL.Text,
   'createdAt' : IDL.Int,
-  'audioUrl1' : IDL.Text,
-  'audioUrl2' : IDL.Text,
-  'notesUrl' : IDL.Text,
-  'quizQuestions' : IDL.Text,
-  'flashcards' : IDL.Text,
-  'trueFalseQuestions' : IDL.Text,
 });
 export const PdfEntry = IDL.Record({
   'id' : IDL.Nat,
   'url' : IDL.Text,
   'title' : IDL.Text,
   'entryType' : IDL.Text,
+});
+export const Topic = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'notesLabel1' : IDL.Text,
+  'notesLabel2' : IDL.Text,
+  'audioLabel1' : IDL.Text,
+  'audioLabel2' : IDL.Text,
+  'notesUrl1' : IDL.Text,
+  'notesUrl2' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'chapterId' : IDL.Nat,
+  'audioUrl1' : IDL.Text,
+  'audioUrl2' : IDL.Text,
+  'quizQuestions' : IDL.Text,
+  'flashcards' : IDL.Text,
+  'trueFalseQuestions' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
@@ -94,15 +92,30 @@ export const idlService = IDL.Service({
       [],
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-  'addChapter' : IDL.Func([ChapterInput], [IDL.Nat], []),
-  'addPdfEntry' : IDL.Func([PdfEntryInput], [IDL.Nat], []),
+  'addChapter' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+  'addPdfEntry' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+  'addTopic' : IDL.Func([TopicInput], [IDL.Nat], []),
   'deleteChapter' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deletePdfEntry' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteTopic' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'getAllChapters' : IDL.Func([], [IDL.Vec(Chapter)], ['query']),
   'getAllPdfEntries' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
+  'getAllTopics' : IDL.Func([], [IDL.Vec(Topic)], ['query']),
   'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
-  'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
-  'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
+  'getPdfEntry' : IDL.Func([IDL.Nat], [IDL.Opt(PdfEntry)], ['query']),
+  'getTopic' : IDL.Func([IDL.Nat], [IDL.Opt(Topic)], ['query']),
+  'getTopicsByChapter' : IDL.Func([IDL.Nat], [IDL.Vec(Topic)], ['query']),
+  'updateChapter' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Bool],
+      [],
+    ),
+  'updatePdfEntry' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Bool],
+      [],
+    ),
+  'updateTopic' : IDL.Func([IDL.Nat, TopicInput], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
@@ -119,52 +132,50 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
-  const ChapterInput = IDL.Record({
+  const TopicInput = IDL.Record({
     'title' : IDL.Text,
     'notesLabel1' : IDL.Text,
     'notesLabel2' : IDL.Text,
     'audioLabel1' : IDL.Text,
     'audioLabel2' : IDL.Text,
-    'classNumber' : IDL.Text,
     'notesUrl1' : IDL.Text,
     'notesUrl2' : IDL.Text,
-    'subject' : IDL.Text,
+    'chapterId' : IDL.Nat,
     'audioUrl1' : IDL.Text,
     'audioUrl2' : IDL.Text,
-    'notesUrl' : IDL.Text,
     'quizQuestions' : IDL.Text,
     'flashcards' : IDL.Text,
     'trueFalseQuestions' : IDL.Text,
-  });
-  const PdfEntryInput = IDL.Record({
-    'url' : IDL.Text,
-    'title' : IDL.Text,
-    'entryType' : IDL.Text,
   });
   const Chapter = IDL.Record({
     'id' : IDL.Nat,
     'title' : IDL.Text,
-    'notesLabel1' : IDL.Text,
-    'notesLabel2' : IDL.Text,
-    'audioLabel1' : IDL.Text,
-    'audioLabel2' : IDL.Text,
     'classNumber' : IDL.Text,
-    'notesUrl1' : IDL.Text,
-    'notesUrl2' : IDL.Text,
     'subject' : IDL.Text,
     'createdAt' : IDL.Int,
-    'audioUrl1' : IDL.Text,
-    'audioUrl2' : IDL.Text,
-    'notesUrl' : IDL.Text,
-    'quizQuestions' : IDL.Text,
-    'flashcards' : IDL.Text,
-    'trueFalseQuestions' : IDL.Text,
   });
   const PdfEntry = IDL.Record({
     'id' : IDL.Nat,
     'url' : IDL.Text,
     'title' : IDL.Text,
     'entryType' : IDL.Text,
+  });
+  const Topic = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'notesLabel1' : IDL.Text,
+    'notesLabel2' : IDL.Text,
+    'audioLabel1' : IDL.Text,
+    'audioLabel2' : IDL.Text,
+    'notesUrl1' : IDL.Text,
+    'notesUrl2' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'chapterId' : IDL.Nat,
+    'audioUrl1' : IDL.Text,
+    'audioUrl2' : IDL.Text,
+    'quizQuestions' : IDL.Text,
+    'flashcards' : IDL.Text,
+    'trueFalseQuestions' : IDL.Text,
   });
   
   return IDL.Service({
@@ -194,15 +205,30 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-    'addChapter' : IDL.Func([ChapterInput], [IDL.Nat], []),
-    'addPdfEntry' : IDL.Func([PdfEntryInput], [IDL.Nat], []),
+    'addChapter' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+    'addPdfEntry' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+    'addTopic' : IDL.Func([TopicInput], [IDL.Nat], []),
     'deleteChapter' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deletePdfEntry' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteTopic' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'getAllChapters' : IDL.Func([], [IDL.Vec(Chapter)], ['query']),
     'getAllPdfEntries' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
+    'getAllTopics' : IDL.Func([], [IDL.Vec(Topic)], ['query']),
     'getChapter' : IDL.Func([IDL.Nat], [IDL.Opt(Chapter)], ['query']),
-    'updateChapter' : IDL.Func([IDL.Nat, ChapterInput], [IDL.Bool], []),
-    'updatePdfEntry' : IDL.Func([IDL.Nat, PdfEntryInput], [IDL.Bool], []),
+    'getPdfEntry' : IDL.Func([IDL.Nat], [IDL.Opt(PdfEntry)], ['query']),
+    'getTopic' : IDL.Func([IDL.Nat], [IDL.Opt(Topic)], ['query']),
+    'getTopicsByChapter' : IDL.Func([IDL.Nat], [IDL.Vec(Topic)], ['query']),
+    'updateChapter' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
+    'updatePdfEntry' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
+    'updateTopic' : IDL.Func([IDL.Nat, TopicInput], [IDL.Bool], []),
   });
 };
 

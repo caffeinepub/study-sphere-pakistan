@@ -1,14 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ChapterInput, PdfEntryInput } from "../backend";
-import type { Chapter, PdfEntry } from "../types/chapter";
-import { mapBackendChapter, mapBackendPdfEntry } from "../utils/chapterMapper";
+import type { TopicInput } from "../backend";
+import type { Chapter, PdfEntry, Topic } from "../types/chapter";
+import {
+  mapBackendChapter,
+  mapBackendPdfEntry,
+  mapBackendTopic,
+} from "../utils/chapterMapper";
 import { useActor } from "./useActor";
 
 // ─── Chapters ─────────────────────────────────────────────────────────────────
 
 export function useGetAllChapters() {
   const { actor, isFetching } = useActor();
-
   return useQuery<Chapter[]>({
     queryKey: ["chapters"],
     queryFn: async () => {
@@ -22,7 +25,6 @@ export function useGetAllChapters() {
 
 export function useGetChapter(id: string | null) {
   const { actor, isFetching } = useActor();
-
   return useQuery<Chapter | null>({
     queryKey: ["chapter", id],
     queryFn: async () => {
@@ -38,11 +40,18 @@ export function useGetChapter(id: string | null) {
 export function useAddChapter() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (input: ChapterInput) => {
+    mutationFn: async ({
+      title,
+      classNumber,
+      subject,
+    }: {
+      title: string;
+      classNumber: string;
+      subject: string;
+    }) => {
       if (!actor) throw new Error("Actor not initialized");
-      const id = await actor.addChapter(input);
+      const id = await actor.addChapter(title, classNumber, subject);
       return id.toString();
     },
     onSuccess: () => {
@@ -54,11 +63,20 @@ export function useAddChapter() {
 export function useUpdateChapter() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: ChapterInput }) => {
+    mutationFn: async ({
+      id,
+      title,
+      classNumber,
+      subject,
+    }: {
+      id: string;
+      title: string;
+      classNumber: string;
+      subject: string;
+    }) => {
       if (!actor) throw new Error("Actor not initialized");
-      return actor.updateChapter(BigInt(id), input);
+      return actor.updateChapter(BigInt(id), title, classNumber, subject);
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["chapters"] });
@@ -70,7 +88,6 @@ export function useUpdateChapter() {
 export function useDeleteChapter() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (id: string) => {
       if (!actor) throw new Error("Actor not initialized");
@@ -82,11 +99,95 @@ export function useDeleteChapter() {
   });
 }
 
+// ─── Topics ───────────────────────────────────────────────────────────────────
+
+export function useGetTopicsByChapter(chapterId: string | null) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Topic[]>({
+    queryKey: ["topics", chapterId],
+    queryFn: async () => {
+      if (!actor || !chapterId) return [];
+      const result = await actor.getTopicsByChapter(BigInt(chapterId));
+      return result.map(mapBackendTopic);
+    },
+    enabled: !!actor && !isFetching && !!chapterId,
+  });
+}
+
+export function useGetTopic(id: string | null) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Topic | null>({
+    queryKey: ["topic", id],
+    queryFn: async () => {
+      if (!actor || !id) return null;
+      const result = await actor.getTopic(BigInt(id));
+      if (!result) return null;
+      return mapBackendTopic(result);
+    },
+    enabled: !!actor && !isFetching && !!id,
+  });
+}
+
+export function useAddTopic() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: TopicInput) => {
+      if (!actor) throw new Error("Actor not initialized");
+      const id = await actor.addTopic(input);
+      return id.toString();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["topics", variables.chapterId.toString()],
+      });
+    },
+  });
+}
+
+export function useUpdateTopic() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, input }: { id: string; input: TopicInput }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.updateTopic(BigInt(id), input);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["topics", variables.input.chapterId.toString()],
+      });
+      queryClient.invalidateQueries({ queryKey: ["topic", variables.id] });
+    },
+  });
+}
+
+export function useDeleteTopic() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      chapterId: _chapterId,
+    }: {
+      id: string;
+      chapterId: string;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.deleteTopic(BigInt(id));
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["topics", variables.chapterId],
+      });
+    },
+  });
+}
+
 // ─── PDF Entries ──────────────────────────────────────────────────────────────
 
 export function useGetAllPdfEntries() {
   const { actor, isFetching } = useActor();
-
   return useQuery<PdfEntry[]>({
     queryKey: ["pdfEntries"],
     queryFn: async () => {
@@ -101,11 +202,18 @@ export function useGetAllPdfEntries() {
 export function useAddPdfEntry() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (input: PdfEntryInput) => {
+    mutationFn: async ({
+      title,
+      entryType,
+      url,
+    }: {
+      title: string;
+      entryType: string;
+      url: string;
+    }) => {
       if (!actor) throw new Error("Actor not initialized");
-      const id = await actor.addPdfEntry(input);
+      const id = await actor.addPdfEntry(title, entryType, url);
       return id.toString();
     },
     onSuccess: () => {
@@ -117,11 +225,20 @@ export function useAddPdfEntry() {
 export function useUpdatePdfEntry() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: PdfEntryInput }) => {
+    mutationFn: async ({
+      id,
+      title,
+      entryType,
+      url,
+    }: {
+      id: string;
+      title: string;
+      entryType: string;
+      url: string;
+    }) => {
       if (!actor) throw new Error("Actor not initialized");
-      return actor.updatePdfEntry(BigInt(id), input);
+      return actor.updatePdfEntry(BigInt(id), title, entryType, url);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pdfEntries"] });
@@ -132,7 +249,6 @@ export function useUpdatePdfEntry() {
 export function useDeletePdfEntry() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (id: string) => {
       if (!actor) throw new Error("Actor not initialized");

@@ -110,7 +110,7 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
           Here's how you did
         </p>
 
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-600 mb-6">
           <div className="text-5xl font-bold text-primary dark:text-blue-400 mb-2">
             {totalAnswered > 0 ? `${percentage}%` : "—"}
           </div>
@@ -153,9 +153,9 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
           </div>
 
           {totalAnswered > 0 && (
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mt-4">
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 mt-4">
               <div
-                className="h-3 rounded-full bg-primary dark:bg-blue-500 transition-all duration-500"
+                className="h-3 rounded-full bg-primary dark:bg-blue-400 transition-all duration-500"
                 style={{ width: `${percentage}%` }}
               />
             </div>
@@ -226,16 +226,16 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
             </div>
           </div>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
           <div
-            className="h-2 rounded-full bg-primary dark:bg-blue-500 transition-all duration-300"
+            className="h-2 rounded-full bg-primary dark:bg-blue-400 transition-all duration-300"
             style={{ width: `${(currentIndex / questions.length) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Statement card */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-600">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
           Statement
         </p>
@@ -254,7 +254,7 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
             "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 py-6 font-bold text-lg transition-all duration-200 ";
           if (!isAnswered) {
             cls +=
-              "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 cursor-pointer";
+              "border-blue-300 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 hover:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800/60 cursor-pointer";
           } else if (isCorrect && isSelected) {
             cls +=
               "border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 shadow-[0_0_16px_rgba(34,197,94,0.45)]";
@@ -266,7 +266,7 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
               "border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 shadow-[0_0_12px_rgba(34,197,94,0.3)]";
           } else {
             cls +=
-              "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 opacity-50";
+              "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700/60 text-gray-400 dark:text-gray-400 opacity-50";
           }
           return (
             <button
@@ -293,7 +293,7 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
             "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 py-6 font-bold text-lg transition-all duration-200 ";
           if (!isAnswered) {
             cls +=
-              "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer";
+              "border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-100 hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer";
           } else if (isCorrect && isSelected) {
             cls +=
               "border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 shadow-[0_0_16px_rgba(34,197,94,0.45)]";
@@ -305,7 +305,7 @@ export default function TrueFalseSection({ questions }: TrueFalseSectionProps) {
               "border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 shadow-[0_0_12px_rgba(34,197,94,0.3)]";
           } else {
             cls +=
-              "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 opacity-50";
+              "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700/60 text-gray-400 dark:text-gray-400 opacity-50";
           }
           return (
             <button

@@ -7,7 +7,7 @@ export default function Footer() {
   const appId = encodeURIComponent(window.location.hostname || "studyhub-app");
 
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
+    <footer className="bg-white dark:bg-card border-t border-gray-200 dark:border-gray-600 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
@@ -68,7 +68,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             © {year} StudyHub. All rights reserved.
           </p>

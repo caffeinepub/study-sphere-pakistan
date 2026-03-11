@@ -1,15 +1,14 @@
-// Utility to map between backend Chapter/PdfEntry types (bigint IDs, JSON strings)
-// and the frontend Chapter/PdfEntry types (string IDs, parsed arrays).
-
 import type {
   Chapter as BackendChapter,
   PdfEntry as BackendPdfEntry,
+  Topic as BackendTopic,
 } from "../backend";
 import type {
   Chapter,
   FlashcardItem,
   PdfEntry,
   QuizQuestion,
+  Topic,
   TrueFalseQuestion,
 } from "../types/chapter";
 
@@ -28,22 +27,30 @@ export function mapBackendChapter(bc: BackendChapter): Chapter {
     title: bc.title,
     classNumber: bc.classNumber,
     subject: bc.subject,
-    notesUrl: bc.notesUrl,
-    notesUrl1: bc.notesUrl1 ?? "",
-    notesLabel1: bc.notesLabel1 ?? "",
-    notesUrl2: bc.notesUrl2 ?? "",
-    notesLabel2: bc.notesLabel2 ?? "",
-    audioLabel1: bc.audioLabel1 ?? "",
-    audioLabel2: bc.audioLabel2 ?? "",
-    audioUrl1: bc.audioUrl1 ?? "",
-    audioUrl2: bc.audioUrl2 ?? "",
-    quizQuestions: safeParseJson<QuizQuestion[]>(bc.quizQuestions, []),
-    flashcards: safeParseJson<FlashcardItem[]>(bc.flashcards, []),
+    createdAt: Number(bc.createdAt),
+  };
+}
+
+export function mapBackendTopic(bt: BackendTopic): Topic {
+  return {
+    id: bt.id.toString(),
+    chapterId: bt.chapterId.toString(),
+    title: bt.title,
+    notesUrl1: bt.notesUrl1 ?? "",
+    notesLabel1: bt.notesLabel1 ?? "",
+    notesUrl2: bt.notesUrl2 ?? "",
+    notesLabel2: bt.notesLabel2 ?? "",
+    audioUrl1: bt.audioUrl1 ?? "",
+    audioLabel1: bt.audioLabel1 ?? "",
+    audioUrl2: bt.audioUrl2 ?? "",
+    audioLabel2: bt.audioLabel2 ?? "",
+    quizQuestions: safeParseJson<QuizQuestion[]>(bt.quizQuestions, []),
+    flashcards: safeParseJson<FlashcardItem[]>(bt.flashcards, []),
     trueFalseQuestions: safeParseJson<TrueFalseQuestion[]>(
-      bc.trueFalseQuestions,
+      bt.trueFalseQuestions,
       [],
     ),
-    createdAt: Number(bc.createdAt),
+    createdAt: Number(bt.createdAt),
   };
 }
 

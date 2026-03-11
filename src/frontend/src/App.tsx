@@ -20,6 +20,7 @@ import MDCATSubjectPage from "./pages/MDCATSubjectPage";
 import SubjectPage from "./pages/SubjectPage";
 import SupportPage from "./pages/SupportPage";
 import TermsPage from "./pages/TermsPage";
+import TopicPage from "./pages/TopicPage";
 
 // Dark Mode Context
 interface DarkModeContextType {
@@ -70,7 +71,6 @@ function DarkModeProvider({ children }: { children: React.ReactNode }) {
 
 const queryClient = new QueryClient();
 
-// Scroll to top on every route change
 function ScrollToTop() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const prevPathRef = useRef(pathname);
@@ -85,7 +85,6 @@ function ScrollToTop() {
   return null;
 }
 
-// Layout component
 function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
@@ -99,59 +98,53 @@ function Layout() {
   );
 }
 
-// Routes
-const rootRoute = createRootRoute({
-  component: Layout,
-});
+const rootRoute = createRootRoute({ component: Layout });
 
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: HomePage,
 });
-
 const classRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/class/$classNum",
   component: ClassPage,
 });
-
 const subjectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/class/$classNum/$subject",
   component: SubjectPage,
 });
-
 const chapterRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/chapter/$chapterId",
   component: ChapterPage,
 });
-
+const topicRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/topic/$topicId",
+  component: TopicPage,
+});
 const mdcatRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/mdcat",
   component: MDCATPage,
 });
-
 const mdcatSubjectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/mdcat/$subject",
   component: MDCATSubjectPage,
 });
-
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin",
   component: AdminPage,
 });
-
 const termsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/terms",
   component: TermsPage,
 });
-
 const supportRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/support",
@@ -163,6 +156,7 @@ const routeTree = rootRoute.addChildren([
   classRoute,
   subjectRoute,
   chapterRoute,
+  topicRoute,
   mdcatRoute,
   mdcatSubjectRoute,
   adminRoute,
@@ -170,10 +164,7 @@ const routeTree = rootRoute.addChildren([
   supportRoute,
 ]);
 
-const router = createRouter({
-  routeTree,
-  scrollRestoration: false,
-});
+const router = createRouter({ routeTree, scrollRestoration: false });
 
 declare module "@tanstack/react-router" {
   interface Register {
