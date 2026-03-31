@@ -43,7 +43,7 @@ export default function SupportPage() {
         </div>
 
         {/* Easypaisa Card */}
-        <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 p-8 shadow-sm mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 shadow-sm mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <Smartphone className="w-5 h-5 text-green-600 dark:text-green-400" />
@@ -58,7 +58,7 @@ export default function SupportPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-muted/60 rounded-xl border border-gray-200 dark:border-gray-600 p-4 flex items-center justify-between mb-4">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between mb-4">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 Account Number
@@ -96,7 +96,7 @@ export default function SupportPage() {
         </div>
 
         {/* Steps */}
-        <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 p-6 shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
           <h3 className="font-heading font-semibold text-gray-900 dark:text-white mb-4">
             How to Send
           </h3>
@@ -110,7 +110,7 @@ export default function SupportPage() {
             ].map((step, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: ordered steps are positional by design
               <li key={i} className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-primary/10 dark:bg-blue-800/40 text-primary dark:text-blue-300 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="w-6 h-6 rounded-full bg-primary/10 dark:bg-blue-900/30 text-primary dark:text-blue-400 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 dark:text-gray-400 text-sm">

@@ -65,7 +65,7 @@ export default function TermsPage() {
           {sections.map((section, i) => (
             <div
               key={section.title}
-              className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 p-6 shadow-sm"
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
             >
               <h2 className="font-heading font-semibold text-lg text-gray-900 dark:text-white mb-3">
                 {i + 1}. {section.title}
@@ -77,7 +77,7 @@ export default function TermsPage() {
           ))}
 
           {/* Last condition with hidden "Sia" admin entry */}
-          <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 p-6 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
             <h2 className="font-heading font-semibold text-lg text-gray-900 dark:text-white mb-3">
               5. Copyright
             </h2>
@@ -100,7 +100,7 @@ export default function TermsPage() {
           </div>
         </div>
 
-        <div className="mt-8 p-4 bg-gray-50 dark:bg-muted/50 rounded-xl border border-gray-200 dark:border-gray-600 text-center">
+        <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             If you have any questions about these terms, please contact us
             through the{" "}
@@ -116,7 +116,7 @@ export default function TermsPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <span className="text-xs text-gray-300 dark:text-gray-600">
+          <span className="text-xs text-gray-300 dark:text-gray-700">
             v1.0 &copy; {new Date().getFullYear()} StudyHub
           </span>
         </div>

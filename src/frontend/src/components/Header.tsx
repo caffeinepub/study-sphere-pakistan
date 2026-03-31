@@ -17,7 +17,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-gray-200 dark:border-gray-600 shadow-sm transition-colors duration-300">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -37,7 +37,7 @@ export default function Header() {
                 key={link.path}
                 type="button"
                 onClick={() => navigate({ to: link.path })}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-muted transition-colors duration-200"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
               >
                 {link.label}
               </button>
@@ -78,7 +78,7 @@ export default function Header() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-600 py-2">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-2">
             {navLinks.map((link) => (
               <button
                 key={link.path}
@@ -87,7 +87,7 @@ export default function Header() {
                   navigate({ to: link.path });
                   setMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-muted transition-colors duration-200"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
               >
                 {link.label}
               </button>

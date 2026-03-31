@@ -126,7 +126,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/20 dark:from-blue-900/25 dark:via-background dark:to-background py-20 px-4">
+      <section className="relative bg-gradient-to-br from-primary/10 via-background to-accent/20 dark:from-blue-900/20 dark:via-gray-900 dark:to-gray-900 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 dark:bg-blue-900/30 text-primary dark:text-blue-400 text-sm font-medium mb-6">
             <BookOpen className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function HomePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search chapters..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-blue-400 transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 transition-colors"
               />
             </div>
             <button
@@ -197,7 +197,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-card/50">
+      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 dark:text-white text-center mb-3">
             Everything You Need to Succeed
@@ -210,7 +210,7 @@ export default function HomePage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-gray-600 p-6 hover:shadow-md dark:hover:shadow-black/30 transition-all duration-200"
+                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all duration-200"
               >
                 <div
                   className={`w-12 h-12 rounded-xl ${feature.bg} flex items-center justify-center mb-4`}
@@ -230,7 +230,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-primary dark:bg-blue-800/50">
+      <section className="py-16 px-4 bg-primary dark:bg-blue-900/40">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-heading font-bold text-white mb-4">
             Start Studying Today

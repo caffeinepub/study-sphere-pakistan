@@ -113,7 +113,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
           Here's how you did
         </p>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-600 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 mb-6">
           <div className="text-5xl font-bold text-primary dark:text-blue-400 mb-2">
             {totalAnswered > 0 ? `${percentage}%` : "—"}
           </div>
@@ -157,9 +157,9 @@ export default function QuizSection({ questions }: QuizSectionProps) {
           </div>
 
           {totalAnswered > 0 && (
-            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 mt-4">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mt-4">
               <div
-                className="h-3 rounded-full bg-primary dark:bg-blue-400 transition-all duration-500"
+                className="h-3 rounded-full bg-primary dark:bg-blue-500 transition-all duration-500"
                 style={{ width: `${percentage}%` }}
               />
             </div>
@@ -235,16 +235,16 @@ export default function QuizSection({ questions }: QuizSectionProps) {
             </div>
           </div>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
-            className="h-2 rounded-full bg-primary dark:bg-blue-400 transition-all duration-300"
+            className="h-2 rounded-full bg-primary dark:bg-blue-500 transition-all duration-300"
             style={{ width: `${(currentIndex / questions.length) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Question */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-600">
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6">
         <p className="font-semibold text-lg text-gray-900 dark:text-white leading-relaxed">
           {currentQuestion.question}
         </p>
@@ -262,7 +262,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
 
           if (!isAnswered) {
             optionClass +=
-              "border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:border-primary dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer";
+              "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:border-primary dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer";
           } else if (isCorrect) {
             optionClass +=
               "border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 shadow-[0_0_12px_rgba(34,197,94,0.4)]";
@@ -271,7 +271,7 @@ export default function QuizSection({ questions }: QuizSectionProps) {
               "border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200";
           } else {
             optionClass +=
-              "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-750 text-gray-400 dark:text-gray-400 opacity-60";
+              "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 opacity-60";
           }
 
           return (

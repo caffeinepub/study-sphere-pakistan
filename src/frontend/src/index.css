@@ -29,43 +29,43 @@
     --warning-foreground: oklch(0.15 0.02 240);
     --radius: 0.5rem;
 
-    /* Flashcard specific — gray background with white text */
-    --flashcard-front-bg: oklch(0.42 0 0);
-    --flashcard-front-text: oklch(1.0 0 0);
-    --flashcard-back-bg: oklch(0.55 0 0);
-    --flashcard-back-text: oklch(1.0 0 0);
+    /* Flashcard specific */
+    --flashcard-front-bg: oklch(0.45 0.18 250);
+    --flashcard-front-text: oklch(0.98 0.005 240);
+    --flashcard-back-bg: oklch(0.55 0.18 145);
+    --flashcard-back-text: oklch(0.98 0.005 240);
   }
 
   .dark {
-    --background: oklch(0.15 0.02 240);
+    --background: oklch(0.13 0.02 240);
     --foreground: oklch(0.93 0.01 240);
-    --card: oklch(0.21 0.025 240);
+    --card: oklch(0.18 0.025 240);
     --card-foreground: oklch(0.93 0.01 240);
-    --popover: oklch(0.21 0.025 240);
+    --popover: oklch(0.18 0.025 240);
     --popover-foreground: oklch(0.93 0.01 240);
-    --primary: oklch(0.62 0.18 250);
+    --primary: oklch(0.6 0.18 250);
     --primary-foreground: oklch(0.98 0.005 240);
-    --secondary: oklch(0.28 0.03 240);
-    --secondary-foreground: oklch(0.92 0.01 240);
-    --muted: oklch(0.26 0.025 240);
-    --muted-foreground: oklch(0.7 0.03 240);
-    --accent: oklch(0.34 0.06 200);
-    --accent-foreground: oklch(0.92 0.01 240);
-    --destructive: oklch(0.6 0.22 25);
+    --secondary: oklch(0.25 0.03 240);
+    --secondary-foreground: oklch(0.9 0.01 240);
+    --muted: oklch(0.22 0.025 240);
+    --muted-foreground: oklch(0.65 0.03 240);
+    --accent: oklch(0.3 0.06 200);
+    --accent-foreground: oklch(0.9 0.01 240);
+    --destructive: oklch(0.55 0.22 25);
     --destructive-foreground: oklch(0.98 0.005 240);
-    --border: oklch(0.32 0.025 240);
-    --input: oklch(0.32 0.025 240);
-    --ring: oklch(0.62 0.18 250);
-    --success: oklch(0.6 0.18 145);
+    --border: oklch(0.28 0.025 240);
+    --input: oklch(0.28 0.025 240);
+    --ring: oklch(0.6 0.18 250);
+    --success: oklch(0.55 0.18 145);
     --success-foreground: oklch(0.98 0.005 240);
-    --warning: oklch(0.72 0.18 75);
+    --warning: oklch(0.7 0.18 75);
     --warning-foreground: oklch(0.15 0.02 240);
 
-    /* Flashcard specific — gray with white text in dark mode */
-    --flashcard-front-bg: oklch(0.38 0 0);
-    --flashcard-front-text: oklch(1.0 0 0);
-    --flashcard-back-bg: oklch(0.5 0 0);
-    --flashcard-back-text: oklch(1.0 0 0);
+    /* Flashcard specific */
+    --flashcard-front-bg: oklch(0.35 0.18 250);
+    --flashcard-front-text: oklch(0.95 0.01 240);
+    --flashcard-back-bg: oklch(0.35 0.18 145);
+    --flashcard-back-text: oklch(0.95 0.01 240);
   }
 }
 

@@ -1,5 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
-import { BookOpen, CheckCircle } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle,
+  FileText,
+  HelpCircle,
+  Layers,
+  Music,
+} from "lucide-react";
 import type { Chapter } from "../types/chapter";
 import { isChapterCompleted } from "../utils/storageService";
 
@@ -10,6 +17,15 @@ interface ChapterCardProps {
 export default function ChapterCard({ chapter }: ChapterCardProps) {
   const navigate = useNavigate();
   const done = isChapterCompleted(chapter.id);
+
+  const features = [
+    chapter.notesUrl && { icon: FileText, label: "Notes" },
+    chapter.audioUrl1 && { icon: Music, label: "Audio" },
+    chapter.quizQuestions &&
+      chapter.quizQuestions.length > 0 && { icon: HelpCircle, label: "Quiz" },
+    chapter.flashcards &&
+      chapter.flashcards.length > 0 && { icon: Layers, label: "Cards" },
+  ].filter(Boolean) as { icon: React.ElementType; label: string }[];
 
   return (
     <button
@@ -31,6 +47,19 @@ export default function ChapterCard({ chapter }: ChapterCardProps) {
             <h3 className="font-heading font-semibold text-sm leading-snug truncate text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
               {chapter.title}
             </h3>
+            {features.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {features.map(({ icon: Icon, label }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full"
+                  >
+                    <Icon className="w-3 h-3" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
